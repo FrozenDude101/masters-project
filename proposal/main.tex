@@ -1,0 +1,77 @@
+\documentclass[a4paper]{article}
+
+\usepackage[
+backend=biber,
+style=alphabetic,
+]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage{listings}
+
+\title{Project Proposal}
+\author{Matthew Hammond\\2191335\\Vincent Rahli}
+\date{October 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Functional programming is an increasingly popular paradigm, from it's inception in 1950 with Lisp, it was identified as an important paradigm for creating robust, testable, and scalable code \cite{10.1093/comjnl/32.2.98}. The 2015 review of Hughes' article by Hu et al. \cite{10.1093/nsr/nwv042} highlighted the explosion of functional features, especially higher order functions, in modern languages such as C\#, C++, and Java, as well as how further research has led to improved performance of lazy evaluation.
+
+It's no surprise that this has also led to a rise in functional programming within both online and university courses. \cite{warwickFP, kentFP, birminghamFP, courseraFP} Typically these are taught after imperative programming, as functional is seen as having harder concepts, some of which are summarised below.
+\subsection{Pure vs Impure}
+A pure function is a function with no side effects. A side effect can be anything from reading and writing external state, to non-determinism. A pure function only depends on its inputs, and is unaffected by anything else, which means calling it with the same arguments always result in the same return value.
+
+Pure functions are easier to test, as only their inputs must be supplied and their outputs recorded, but impure functions may require construction of a specific global state before running, and checking the global state after running.
+\begin{lstlisting}[language=python, caption=A pure and impure function.]
+def pure(x, y):
+    return x + y
+
+def impure():
+    return input(">>")
+\end{lstlisting}
+Calling the impure function can return many different inputs
+This adds additional complexity. How can we read and write files, or take user input while keeping our program pure?\\
+The answer is, we can't. IO is inherently impure unless you extend your functions to take the entire world, as described by Jones \cite{peytonjones2001tackling}.
+\subsection{Lazy vs Eager}
+In a language with lazy evaluation, 
+\subsection{IO and Monads}
+\section{Challenges}
+Implementing the entirety of the Haskell language is not a feasible goal. Not only is the standard library quite large, but many features have a layer of syntactic sugar on top.
+\begin{lstlisting}[language=haskell, caption=3 ways to write a simple list.\cite{birminghamFP}]
+listcomma  = [1, 2, 3, 4, 5]
+listinfix  = (1:2:3:4:5:[])
+listprefix = ((:) 1 ((:) 2 ((:) 3 ((:) 4 ((:) 5 [])))))
+\end{lstlisting}
+
+\section{Milestones}
+\subsection{Timeline}
+\subsubsection{Week 1}
+
+\subsection{Basic Implementation}
+The first goal is to create a basic implementation. It should have a similar notation to Haskell. This core must be able to handle built-in basic types, such as Char, Int, and Float, as well as allow for generic type arguments. Like Haskell, currying will be implemented by default. At this stage monadic IO will not be implemented, instead a specific input can be passed into the function, and the output displayed during execution, and in a separate box.
+\begin{lstlisting}[language=haskell, caption=Example functions of stage 1.]
+    id :: A -> A
+    id a = a
+
+    add :: Int -> Int -> Int
+    add a b = a + b
+
+    add1 :: Int -> Int
+    add1 = add 1
+\end{lstlisting}
+\subsection{Extended Typing}
+This goal will extend to user defined types, as well as define some of the functions used in Haskell's Prelude module (in which List will be defined as Cons and Nil).
+\subsection{Monads}
+Lastly, monads will be implemented. This will require an IO interface, rather than just a raw input into a program.
+\section{Literature Review}
+Segal 1994 \cite{segal1994empirical} is about participants reasoning around recursion, and noted that tail recursion was understood well, but central recursion was not.
+Central recursion was misunderstood in a couple ways, some participants stopped as soon as the base case was reached, ignoring the rest of the function past the recursive call.
+Others only executed the rest of the function for the base case and the top case, forgetting the middle case(s).
+
+Visualisation of programs as a flowchart, called a "blueprint", \cite{steenvoorden2017visual} has been shown to effectively explain monads to students, particularly those who identified as visual learners.
+
+\printbibliography
+
+\end{document}
