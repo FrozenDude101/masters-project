@@ -6,6 +6,9 @@ style=alphabetic,
 ]{biblatex}
 \addbibresource{references.bib}
 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
 \usepackage{listings}
 
 \title{Project Proposal}
@@ -25,53 +28,131 @@ A pure function is a function with no side effects. A side effect can be anythin
 
 Pure functions are easier to test, as only their inputs must be supplied and their outputs recorded, but impure functions may require construction of a specific global state before running, and checking the global state after running.
 \begin{lstlisting}[language=python, caption=A pure and impure function.]
-def pure(x, y):
-    return x + y
+  def pure(x, y):
+      return x + y
 
-def impure():
-    return input(">>")
+  def impure():
+      return input(">>")
 \end{lstlisting}
-Calling the impure function can return many different inputs
+Calling the impure function can return many different inputs, and affect the outcomes of other running programs.
 This adds additional complexity. How can we read and write files, or take user input while keeping our program pure?\\
 The answer is, we can't. IO is inherently impure unless you extend your functions to take the entire world, as described by Jones \cite{peytonjones2001tackling}.
+\begin{lstlisting}[language=haskell]
+  pureInput :: World -> (String, World)
+  pureOutput :: (String, World) -> World
+\end{lstlisting}
 \subsection{Lazy vs Eager}
-In a language with lazy evaluation, 
-\subsection{IO and Monads}
+In a language with lazy evaluation, impure functions are especially dangerous. The order of operations could be completely different. Jones goes on to describe the situation of a list of calls to a Haskell's "printChar" function.
+\begin{lstlisting}[language=haskell, caption=An example of lazy evaluation gone awry with IO.]
+  xs = [printChar 'a', printChar 'b']
+\end{lstlisting}
+Alone it doesn't have any side effects, and it's even possible to pass it into some methods such as "length" without any output, as "length" does not evaluate each item in the list.
+This is the opposite behaviour to an eager evaluated language, where both characters would be printed out when "xs" was allocated. 
+\subsection{Functors, Monads, and more, oh my!}
+How can we mitigate these issues? It's all well and good to calculate the solution to a problem, but what good is it if we can't see the solution? A pure program with no side effects can perform computation, but not relay that computation to the user in any useful way.
+
+Haskell's solution is to wrap all IO operations return types in an IO Monad, defined as a typeclass. This doesn't purify IO, but informs the programmer than this function is impure, and must be handled in the proper way. (Haskell's "performUnsafeIO", among others, is an exception, which passes the responsibility of safety to the programmer, and can completely break type safety if used improperly)
+\begin{lstlisting}[language=haskell, caption=Haskell's Functor and Monad typeclasses.]
+  class Functor f where
+      fmap :: (a -> b) -> f a -> f b
+      (<$) :: a -> f b -> f b
+        
+  class Applicative m => Monad m where
+      (>>=)  :: m a -> (a -> m b) -> m b
+      return :: a -> m a
+\end{lstlisting}
+Functors and Monads enforce that once you enter the realm of IO, it's not possible to safely leave! Using the results of an IO operation require functions to also return IO.
+This could be in the form of a single "return" statement, returning a value of type "IO ()", or a more complex result.
+The "$>>$=" (pronounced bind) function allows the results of IO functions to be piped into other functions, providing they return an IO type.
+The "fmap" function allows functions not designed for IO to take the results of an IO operation. This can be extended in multiple ways to work with multiple argument functions, such as by using the Applicative typeclass, or the "ap" function in Control.Monad.
+\begin{lstlisting}[language=haskell, caption=fmap and bind allow IO operations to be used safely]
+  reverse :: [a] -> [a]
+  getLine :: IO String
+  print :: Show s => s -> IO ()
+
+  main :: IO()
+  main = fmap reverse getLine >>= print
+\end{lstlisting}
+\subsection{Visualisers}
+There are numerous visualisers, both on and offline with various goals. Some aim to show algorithms and data structures \cite{algo-vis}, and others \cite{cscircles-vis}aim to show complete execution, showing which variables are in scope and where.
 \section{Challenges}
-Implementing the entirety of the Haskell language is not a feasible goal. Not only is the standard library quite large, but many features have a layer of syntactic sugar on top.
-\begin{lstlisting}[language=haskell, caption=3 ways to write a simple list.\cite{birminghamFP}]
-listcomma  = [1, 2, 3, 4, 5]
-listinfix  = (1:2:3:4:5:[])
-listprefix = ((:) 1 ((:) 2 ((:) 3 ((:) 4 ((:) 5 [])))))
+Implementing the entirety of the Haskell language is not a feasible goal. Not only is the standard library very large, but many features have a layer of syntactic sugar on top. Examples include lists, do notation, if-then-else statements, switching prefix/infix, e.t.c. 
+\begin{lstlisting}[language=haskell, caption=Some of the ways to write a simple list.\cite{syntatic-sugar}]
+  listcomma  = [1, 2, 3, 4, 5]
+  listinfix  = (1:2:3:4:5:[])
+  listprefix = ((:) 1 ((:) 2 ((:) 3 ((:) 4 ((:) 5 [])))))
+\end{lstlisting}
+To mitigate this, the implementation will focus on single versions of each. Syntactic sugar can be implemented towards the end of development, if there is time to do so, and when it is necessary.
+Similarly, it may be useful to restrict some aspects of the current syntax, such as whitespace. Haskell uses significant whitespace in its syntax, e.g lines of let notation must be on the same line, however this is again syntactic sugar for anonymous functions.
+\begin{lstlisting}[language=haskell, caption=let notation and the underlying meaning]
+    let
+      x = 1
+      y = 2
+    in (x, y)
+
+    (\x -> \y -> (x, y)) 1 2
 \end{lstlisting}
 
+It will be important to get user feedback at all stages of development, as users won't find the tool useful if they find it hard or confusing to use. Feedback will be valuable from all users, but especially those that struggled with functional programming. As the milestones are completed, the UI will be adjusted to fit additional requirements.
 \section{Milestones}
-\subsection{Timeline}
-\subsubsection{Week 1}
+\subsection{Basic Implementation, Week 1-8}
+The core component of a functional languages, are the functions. Which all later features build upon. This includes functions with specific types, as well as generic functions.
 
-\subsection{Basic Implementation}
-The first goal is to create a basic implementation. It should have a similar notation to Haskell. This core must be able to handle built-in basic types, such as Char, Int, and Float, as well as allow for generic type arguments. Like Haskell, currying will be implemented by default. At this stage monadic IO will not be implemented, instead a specific input can be passed into the function, and the output displayed during execution, and in a separate box.
-\begin{lstlisting}[language=haskell, caption=Example functions of stage 1.]
-    id :: A -> A
-    id a = a
+Certain functions, such as "+" will be implemented in JavaScript to perform the actual execution, but will still be shown as a normal typed function. This means internally functions could be represented as a pure Haskell function, or as a JavaScript function with the Haskell shown to the user. This will only need to be done for primitive operations, as all others will be able to made out of a composition of primitive operations.
 
-    add :: Int -> Int -> Int
-    add a b = a + b
+Visualising execution is also a major part of this milestone. This can happen on a static web page, using the user's computer for parsing, execution, and analysis, as a server is not necessary. User feedback will be taken into consideration while designing, the interface and visualisation to make it as useful as possible.
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{mockup-1}
+    \caption{First mockup of the user interface.}
+    \label{fig:mockup-1}
+\end{figure}
 
-    add1 :: Int -> Int
-    add1 = add 1
+In Figure \ref{fig:mockup-1} the user interface contains an input for the code with some example functions of this milestone, in the top left, the "add1" function is selected for testing, with the input 3. The execution is shown on the right, with the "add1" function again selected to show extra information, showing that it adds 1 to the number passed in.
+\subsubsection{Steps}
+\begin{itemize}
+    \item Implement a user interface, with code, input, and output fields.
+    \item Implement parsing of functions, their types.
+    \item Implement function application, and lazy evaluation.
+    \item Display function evaluation in a visual graph-like way.
+\end{itemize}
+\subsection{Extended Typing, Week 9-14}
+\label{extended-typing}
+This goal will extend to user defined types, as well as define some of the functions used in Haskell's Prelude module (in which List will be defined as Cons and Nil). The key milestones for this goal will be the "data" and "type" keywords, as they allow for further definition of types in Haskell.
+\begin{lstlisting}[language=haskell, caption=Example functions/types of stage 2.]
+  data List A = Cons A (List A) | Nil
+
+  map :: (A -> B) -> List A -> List B
+  map f Nil         = Nil
+  map f (Cons x xs) = Cons (f x) (map f xs)
 \end{lstlisting}
-\subsection{Extended Typing}
-This goal will extend to user defined types, as well as define some of the functions used in Haskell's Prelude module (in which List will be defined as Cons and Nil).
-\subsection{Monads}
-Lastly, monads will be implemented. This will require an IO interface, rather than just a raw input into a program.
-\section{Literature Review}
-Segal 1994 \cite{segal1994empirical} is about participants reasoning around recursion, and noted that tail recursion was understood well, but central recursion was not.
-Central recursion was misunderstood in a couple ways, some participants stopped as soon as the base case was reached, ignoring the rest of the function past the recursive call.
-Others only executed the rest of the function for the base case and the top case, forgetting the middle case(s).
+\subsubsection{Steps}
+\begin{itemize}
+    \item Implement parsing of type syntax, "data", "type", and "newtype" keywords, and type variables.
+    \item Implement parsing of functions using user-defined types.
+    \item Implement a variety of Prelude's built-in types.
+    \item Display type construction in a visual graph-like way.
+\end{itemize}
+\subsection{Typeclasses and Monads, Week 15-22}
+Lastly, monads will be implemented. This will require an IO interface, rather than just a raw input into a program. The key milestone for this goal will be the "class" keyword, as that allows for typeclasses, which monads are implemented using.
+The key feature of typeclasses is operator overloading. Many instances of the Monad typeclass exists, but the exact function used depends on the data being acted on.
+This will also allow for simplification of other functions, by using typeclasses to move the overloaded operators into, for example addition, where each numerical type can define it's own addition, which other functions can then use.
 
-Visualisation of programs as a flowchart, called a "blueprint", \cite{steenvoorden2017visual} has been shown to effectively explain monads to students, particularly those who identified as visual learners.
+At this point proper IO can be added. The interface can be modified to support both running the program as a whole, through a "main :: IO ()" function, or running a specific function. Console IO could be implemented through JavaScript modals, or new input/output boxes specifically for console IO (as running the whole program wouldn't specifically take any inputs, nor output anything). Visually IO could be shown as a simplified form of Jones' example, taking just the Console, instead of the World as an argument.
+\begin{lstlisting}[language=haskell, caption=The Num typeclass. (+) would be implemented in JavaScript.]
+  class Num n where
+    (+) :: n -> n -> n
+    ...
 
+  instance Num Integer where
+    a + b = ...
+    ...
+\end{lstlisting}
+\subsubsection{Steps}
+\begin{itemize}
+    \item Implement parsing of typeclass syntax, "class", "instance", and "where" keywords.
+    \item Implement typeclasses for the defined types in Section \ref{extended-typing} where appropriate.
+    \item Correct identification and evaluation of the correct operator function.
+    \item Implement visually the application of typeclass functions.
+\end{itemize}
 \printbibliography
-
 \end{document}
