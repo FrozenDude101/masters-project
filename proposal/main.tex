@@ -5,6 +5,7 @@ backend=biber,
 style=alphabetic,
 ]{biblatex}
 \addbibresource{references.bib}
+\usepackage{hyperref}
 
 \usepackage{graphicx}
 \graphicspath{ {./images/} }
@@ -36,13 +37,13 @@ Pure functions are easier to test, as only their inputs must be supplied and the
 \end{lstlisting}
 Calling the impure function can return many different inputs, and affect the outcomes of other running programs.
 This adds additional complexity. How can we read and write files, or take user input while keeping our program pure?\\
-The answer is, we can't. IO is inherently impure unless you extend your functions to take the entire world, as described by Jones \cite{peytonjones2001tackling}.
+The answer is, we can't. IO is inherently impure unless you extend your functions to take the entire world, as described by Peyton Jones \cite{peytonjones2001tackling}.
 \begin{lstlisting}[language=haskell]
   pureInput :: World -> (String, World)
   pureOutput :: (String, World) -> World
 \end{lstlisting}
 \subsection{Lazy vs Eager}
-In a language with lazy evaluation, impure functions are especially dangerous. The order of operations could be completely different. Jones goes on to describe the situation of a list of calls to a Haskell's "printChar" function.
+In a language with lazy evaluation, impure functions are especially dangerous. The order of operations could be completely different. Peyton Jones goes on to describe the situation of a list of calls to a Haskell's "printChar" function.
 \begin{lstlisting}[language=haskell, caption=An example of lazy evaluation gone awry with IO.]
   xs = [printChar 'a', printChar 'b']
 \end{lstlisting}
@@ -74,8 +75,9 @@ The "fmap" function allows functions not designed for IO to take the results of 
   main = fmap reverse getLine >>= print
 \end{lstlisting}
 \subsection{Visualisers}
-There are numerous visualisers, both on and offline with various goals. Some aim to show algorithms and data structures \cite{algo-vis}, and others \cite{cscircles-vis}aim to show complete execution, showing which variables are in scope and where.
+There are numerous visualisers, both on and offline with various goals. Some aim to show algorithms and data structures \cite{algo-vis}, and others \cite{cscircles-vis} aim to show step by step execution, showing which variables are in scope and where, and even one which shows execution by rewriting the code in place, allowing it to be run at any intermediate step \cite{visualize-cbn}! Graph based visualisers, such as the SPARTAN visualiser by Waugh Ambridge \cite{SPARTAN}, can effectively show various functional concepts, such as lazy evaluation with thunks and monads.
 \section{Challenges}
+\subsection{Syntax and Sugar}
 Implementing the entirety of the Haskell language is not a feasible goal. Not only is the standard library very large, but many features have a layer of syntactic sugar on top. Examples include lists, do notation, if-then-else statements, switching prefix/infix, e.t.c. 
 \begin{lstlisting}[language=haskell, caption=Some of the ways to write a simple list.\cite{syntatic-sugar}]
   listcomma  = [1, 2, 3, 4, 5]
@@ -92,28 +94,36 @@ Similarly, it may be useful to restrict some aspects of the current syntax, such
 
     (\x -> \y -> (x, y)) 1 2
 \end{lstlisting}
-
-It will be important to get user feedback at all stages of development, as users won't find the tool useful if they find it hard or confusing to use. Feedback will be valuable from all users, but especially those that struggled with functional programming. As the milestones are completed, the UI will be adjusted to fit additional requirements.
+An online search for pre-existing Haskell parsers comes up empty, searching "parse Haskell in JavaScript" provides numerous methods and discussions about the opposite problem, parsing JavaScript in Haskell. It is possible to convert Haskell and Haskell-like languages to JavaScript, however the generated JavaScript is not always the most readable, nor is it split into tokens for easy parsing and interpreting.\cite{purescript} A bespoke Haskell parser is not a small task, but by splitting the features as described in the timeline, the parser can be incrementally developed in an extensible way to include extended types and typeclasses.
+\subsection{Visualisation}
+Visualising execution is also a major part of this milestone, but as seen above is easy to make overwhelming. In Figure \ref{fig:mockup-1} the full visualisation is shown, which only works for small inputs. The shown "add1" function has constant complexity, but a recursive function, a cornerstone of functional programming, would quickly expand with much worse graph complexity.
+Figure \ref{fig:mockup-2} shows what visualisation can look like for only the current program state, showing each recursive functional call (and the upcoming function call) as arrows. This can be integrated with step controls to step through the execution, and boxes could be highlighted when recursive calls are made and returned from.
+Typically step by step visualisation is used, as it vastly reduces the screen space required to show execution. Especially for imperative languages, where time is also a straightforward component of execution, step by step evaluation 
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{mockup-1}
+    \caption{Full program visualisation}
+    \label{fig:mockup-1}
+\end{figure}
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{mockup-2}
+    \caption{Visualising only current program state}
+    \label{fig:mockup-2}
+\end{figure}
 \section{Milestones}
 \subsection{Basic Implementation, Week 1-8}
 The core component of a functional languages, are the functions. Which all later features build upon. This includes functions with specific types, as well as generic functions.
 
 Certain functions, such as "+" will be implemented in JavaScript to perform the actual execution, but will still be shown as a normal typed function. This means internally functions could be represented as a pure Haskell function, or as a JavaScript function with the Haskell shown to the user. This will only need to be done for primitive operations, as all others will be able to made out of a composition of primitive operations.
 
-Visualising execution is also a major part of this milestone. This can happen on a static web page, using the user's computer for parsing, execution, and analysis, as a server is not necessary. User feedback will be taken into consideration while designing, the interface and visualisation to make it as useful as possible.
-\begin{figure}[h]
-    \includegraphics[width=\textwidth]{mockup-1}
-    \caption{First mockup of the user interface.}
-    \label{fig:mockup-1}
-\end{figure}
+In Figure \ref{fig:mockup-2} the user interface contains an input for the code with some example functions of this milestone, in the top left, the "multiply" function is selected for testing, with the inputs 3 and 4. The execution is shown on the right, with the "multiply 3 3" thunk selected to show extra information, showing that it adds 3 to the result of a recursive call.
 
-In Figure \ref{fig:mockup-1} the user interface contains an input for the code with some example functions of this milestone, in the top left, the "add1" function is selected for testing, with the input 3. The execution is shown on the right, with the "add1" function again selected to show extra information, showing that it adds 1 to the number passed in.
+Visualisation can be done with a library like Cytoscape.js \cite{cytoscape}. This library has a huge array of customisation options for displaying graphs specifically for visualisation and analysis, and comes with many features that will allow large graphs to be displayed well, such as allowing scaling of the full canvas, as well as moving around individual nodes. It is also available as a minified JavaScript file, which can be easily served on the front end without having to generate the graphs server side.
 \subsubsection{Steps}
 \begin{itemize}
     \item Implement a user interface, with code, input, and output fields.
     \item Implement parsing of functions, their types.
     \item Implement function application, and lazy evaluation.
-    \item Display function evaluation in a visual graph-like way.
+    \item Display function evaluation in a visual graph-like way using Cytoscape.js.
 \end{itemize}
 \subsection{Extended Typing, Week 9-14}
 \label{extended-typing}
@@ -137,7 +147,7 @@ Lastly, monads will be implemented. This will require an IO interface, rather th
 The key feature of typeclasses is operator overloading. Many instances of the Monad typeclass exists, but the exact function used depends on the data being acted on.
 This will also allow for simplification of other functions, by using typeclasses to move the overloaded operators into, for example addition, where each numerical type can define it's own addition, which other functions can then use.
 
-At this point proper IO can be added. The interface can be modified to support both running the program as a whole, through a "main :: IO ()" function, or running a specific function. Console IO could be implemented through JavaScript modals, or new input/output boxes specifically for console IO (as running the whole program wouldn't specifically take any inputs, nor output anything). Visually IO could be shown as a simplified form of Jones' example, taking just the Console, instead of the World as an argument.
+At this point proper IO can be added. The interface can be modified to support both running the program as a whole, through a "main :: IO ()" function, or running a specific function. Console IO could be implemented through JavaScript modals, or new input/output boxes specifically for console IO (as running the whole program wouldn't specifically take any inputs, nor output anything). Visually IO could be shown as a simplified form of Peyton Jones' example, taking just the Console, instead of the World as an argument.
 \begin{lstlisting}[language=haskell, caption=The Num typeclass. (+) would be implemented in JavaScript.]
   class Num n where
     (+) :: n -> n -> n
