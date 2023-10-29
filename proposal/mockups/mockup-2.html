@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <link rel="stylesheet" href="style-2.css">
+
+        <script src="main-2.js" defer></script>
+    </head>
+
+    <body>
+        <textarea id="code-input" resize="false">
+id :: A -> A
+id a = a
+       
+add :: Integer -> Integer -> Integer
+add a b = a + b
+            
+add1 :: Integer -> Integer
+add1 = add 1
+
+multiply :: Integer -> Integer -> Integer
+multiply _ 0 = 0
+multiply a b = add a (multiply a (b-1))
+</textarea>
+
+        <div id="function-label">Function to Test:</div>
+        <select id="function-select">
+            <option>multiply</opttion>
+            <option>id</option>
+            <option>add</option>
+            <option>add1</option>
+            <option>multiply</option>
+        </select>
+
+        <div id = "input-label">Function Input:</div>
+        <input id = "input-input" value="3 4">
+
+        <div id = "output-label">Function Output:</div>
+        <input id = "output-input" value="12">
+
+        <div id = "controls-label">Execution Controls</div>
+        <button id="evaluate">Fully Evaluate</button>
+        <button id="step">Step</button>
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
+
+        <canvas id = "code-display"></canvas>
+
+        <div class="function-box" id="add13-display">add 3 (multiply 3 3)</div>
+        <div class="function-box focus" id="plus13-display">multiply 3 3</div>
+       
+        <div id="info-box">
+            multiply 3 3 :: Integer<br>
+            multiply 3 3 = add 3 (multiply 3 (3-1))
+        </div>
+    </body>
+
+</html>

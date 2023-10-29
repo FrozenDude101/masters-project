@@ -1,0 +1,166 @@
+* {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    font-family: monospace;
+    text-wrap: nowrap;
+}
+
+body {
+    background-color: #222;
+}
+
+#code-input {
+    top: 10px;
+    left: 10px;
+
+    width: calc(1280px / 3 - 40px);
+    height: calc(720px / 2 - 40px);
+
+    color: white;
+    background-color: #444;
+
+    resize: none;
+
+    padding: 10px;
+}
+
+#function-label {
+    top: calc(720px / 2 + 5px);
+    left: 10px;
+
+    color: white;
+    text-wrap: nowrap;
+}
+#function-select {
+    top: calc(720px / 2 + 5px);
+    left: calc(1280px / 3 - 280px);
+}
+
+#input-label {
+    top: calc(720px / 2 + 30px);
+    left: 10px;
+
+    color: white;
+    text-wrap: nowrap;
+}
+#input-input {
+    top: calc(720px / 2 + 30px);
+    left: calc(1280px / 3 - 280px);
+}
+
+#output-label {
+    top: calc(720px / 2 + 55px);
+    left: 10px;
+
+    color: white;
+    text-wrap: nowrap;
+}
+#output-input {
+    top: calc(720px / 2 + 55px);
+    left: calc(1280px / 3 - 280px);
+}
+
+#controls-label {
+    top: calc(720px - 50px);
+    left: 10px;
+    color: white;
+    text-wrap: nowrap;
+}
+
+#evaluate {
+    top: calc(720px - 30px);
+    left: 10px;
+}
+
+#step {
+    top: calc(720px - 30px);
+    left: 195px;
+}
+
+#start {
+    top: calc(720px - 30px);
+    left: 135px;
+}
+
+#stop {
+    top: calc(720px - 30px);
+    left: 245px;
+}
+
+#reset {
+    top: calc(720px - 30px);
+    left: 295px;
+}
+
+#code-display {
+    left: calc(1280px / 3 + 5px);
+    top: 10px;
+
+    width: calc(1280px / 3 * 2 - 15px);
+    height: calc(720px - 20px);
+
+    background-color: #444;
+    cursor: grab;
+}
+
+.function-box {
+
+    box-sizing: border-box;
+
+    width: 200px;
+    height: 68px;
+
+    background-color: #888;
+    border-radius: 10px;
+
+    color: black;
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+
+    padding: 26px;
+
+}
+
+.function-box.focus {
+    padding: 23px;
+    background-color: #FFF;
+    border: 3px solid black;
+}
+
+#add1-display {
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2);
+    top: 100px;
+}
+
+#add13-display {
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2);
+    top: 250px;
+}
+
+#plus13-display {
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2);
+    top: 400px;
+}
+
+#val4-display {
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2);
+    top: 550px;
+}
+
+#val3-display {
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2 - 250px);
+    top: 175px;
+}
+
+#info-box {
+
+    background-color: #FFF;
+    padding: 5px;
+    left: calc((2 * 1280px / 3 - 15px) - 200px/2 + 250px);
+    top: 104px;
+    border: 3px solid black;
+
+}

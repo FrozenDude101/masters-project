@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <link rel="stylesheet" href="style-1.css">
+
+        <script src="main-1.js" defer></script>
+    </head>
+
+    <body>
+        <textarea id="code-input" resize="false">
+id :: A -> A
+id a = a
+       
+add :: Integer -> Integer -> Integer
+add a b = a + b
+            
+add1 :: Integer -> Integer
+add1 = add 1
+
+multiply :: Integer -> Integer -> Integer
+multiply _ 0 = 0
+multiply a b = add a (multiply a (b-1))
+</textarea>
+
+        <div id="function-label">Function to Test:</div>
+        <select id="function-select">
+            <option>add1</opttion>
+            <option>id</option>
+            <option>add</option>
+            <option>add1</option>
+            <option>multiply</option>
+        </select>
+
+        <div id = "input-label">Function Input:</div>
+        <input id = "input-input" value="3">
+
+        <div id = "output-label">Function Output:</div>
+        <input id = "output-input" value="4">
+
+        <div id = "controls-label">Execution Controls</div>
+        <button id="evaluate">Fully Evaluate</button>
+        <button id="step">Step</button>
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
+
+        <canvas id = "code-display"></canvas>
+
+        <div class="function-box focus" id="add1-display">add1</div>
+        <div class="function-box" id="add13-display">add1 3</div>
+        <div class="function-box" id="plus13-display">1 + 3</div>
+        <div class="function-box" id="val4-display">4</div>
+    
+        <div class="function-box" id="val3-display">3</div>
+
+        <div id="info-box">
+            add1 :: Integer -> Integer<br>
+            add1 = add 1<br>
+            add1 b = 1 + b
+        </div>
+
+    </body>
+
+</html>
