@@ -17,18 +17,18 @@ let [ttype,  tbtype,  tatype,  tgtycon] = FunctionReference.n(
     "ttype","tbtype","tatype","tgtycon",
 );
 
-ttype.set(all(tbtype, opt(all(rightArrow, ttype))));
-tbtype.set(all(tatype, opt(all(space, tbtype))));
+ttype.set(all(tbtype, opt(all("->", ttype))));
+tbtype.set(all(tatype, opt(all(" ", tbtype))));
 
 tatype.set(any(
     tgtycon,
-    all(openBracket, ttype, closeBracket),
-    all(openParen, ttype, closeParen),
+    all("[", ttype, "]"),
+    all("(", ttype, ")"),
 ));
 
 tgtycon.set(any(
     tqtycon,
-    all(openParen, closeParen),
-    all(openBracket, closeBracket),
-    merge(all(openParen, rightArrow, closeParen), Token.IDENTIFIER),
-))
+    "()",
+    "[]",
+    "(->)",
+));

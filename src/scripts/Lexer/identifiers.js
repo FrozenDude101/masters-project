@@ -41,13 +41,13 @@ treservedop.set(reg("reservedOp",
 
 tvarid.set(diff(
     merge(
-        all(small, many(any(small, large, digit, quote))),
+        all(small, many(any(small, large, digit, "'"))),
         Token.IDENTIFIER
     ),
     treservedid,
 ));
 tconid.set(merge(
-    all(large, many(any(small, large, digit, quote))),
+    all(large, many(any(small, large, digit, "'"))),
     Token.IDENTIFIER
 ));
 ttyvar.set(tvarid);
@@ -57,22 +57,22 @@ tmodid.set(tconid);
 
 tvarsym.set(diff(
     merge(all(
-        diff(symbol, colon),
+        diff(symbol, ":"),
         many(symbol),
     ), Token.IDENTIFIER),
     any(treservedop, dashes),
 ));
 tconsym.set(diff(
     merge(all(
-        colon,
+        ":",
         many(symbol),
     ), Token.IDENTIFIER),
     any(treservedop),
 ));
 
-tqvarid.set(all(opt(all(tmodid, dot)), tvarid));
-tqconid.set(all(opt(all(tmodid, dot)), tconid));
-tqtycon.set(all(opt(all(tmodid, dot)), ttycon));
-tqtycls.set(all(opt(all(tmodid, dot)), ttycls));
-tqvarsym.set(all(opt(all(tmodid, dot)), tvarsym));
-tqconsym.set(all(opt(all(tmodid, dot)), tconsym));
+tqvarid.set(all(opt(all(tmodid, ".")), tvarid));
+tqconid.set(all(opt(all(tmodid, ".")), tconid));
+tqtycon.set(all(opt(all(tmodid, ".")), ttycon));
+tqtycls.set(all(opt(all(tmodid, ".")), ttycls));
+tqvarsym.set(all(opt(all(tmodid, ".")), tvarsym));
+tqconsym.set(all(opt(all(tmodid, ".")), tconsym));

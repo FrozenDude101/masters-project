@@ -8,7 +8,7 @@ function tokenize(f) {
         } else if (f instanceof Function){
             result = f(input.child());
         } else {
-            result = char(f)(input.child());
+            result = str(f)(input.child());
         }
 
         result.prependTokens(input);
@@ -34,7 +34,7 @@ function all(...fs) {
 
     }
 
-    let name = "all: [" + fs.map(f => f.name).join(", ") + "]"
+    let name = "all: [" + fs.map(f => f.name ? f.name : f).join(", ") + "]"
     Object.defineProperty(func, "name", { value: name });
     return func;
 
@@ -60,7 +60,7 @@ function any(...fs) {
 
     }
 
-    let name = "any: [" + fs.map(f => f.name).join(", ") + "]"
+    let name = "any: [" + fs.map(f => f.name ? f.name : f).join(", ") + "]"
     Object.defineProperty(func, "name", { value: name });
     return func;
 
@@ -79,7 +79,7 @@ function opt(f) {
 
     }
 
-    let name = "opt: " + f.name;
+    let name = "opt: " + (f.name ? f.name : f);
     Object.defineProperty(func, "name", { value: name });
     return func;
 
@@ -91,7 +91,7 @@ function many(f) {
         return opt(all(f, many(f)))(input);
     };
 
-    let name = "many: " + f.name;
+    let name = "many: " + (f.name ? f.name : f);
     Object.defineProperty(func, "name", { value: name });
     return func;
 
@@ -128,7 +128,7 @@ function diff(f, g) {
 
     };
 
-    let name = `diff: [${f.name}, ${g.name}]`;
+    let name = `diff: [${f.name ? f.name : f}, ${g.name ? g.name : g}]`;
     Object.defineProperty(func, "name", { value: name });
     return func;
 
@@ -153,19 +153,19 @@ function reg(name, regex, tokenType = Token.NONE) {
     return func;
 
 }
-function char(c) {
+function str(s) {
 
     let func = (input) => {
 
-        if (input.input[0] !== c) throw new LexerError("No char match!");
-        input.addToken(Token.NONE, c);
-        input.advance(1);
+        if (!input.input.join("").startsWith(s)) throw new LexerError("No char match!");
+        input.addToken(Token.NONE, s);
+        input.advance(s.length);
 
         return input;
 
     };
 
-    Object.defineProperty(func, "name", { value: c });
+    Object.defineProperty(func, "name", { value: s });
     return func;
 
 }
@@ -185,7 +185,7 @@ function merge(f, tokenType) {
 
     }
 
-    let name = "merge: " + f.name;
+    let name = "merge: " + (f.name ? f.name : f);
     Object.defineProperty(func, "name", { value: name });
 
     return func;
