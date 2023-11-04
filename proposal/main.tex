@@ -109,8 +109,18 @@ Typically step by step visualisation is used, as it vastly reduces the screen sp
     \caption{Visualising only current program state}
     \label{fig:mockup-2}
 \end{figure}
+\subsection{Type Inference and Type Checking}
+Haskell uses polymorphism extensively, functions can be generalised to take any type, which can be restricted using typeclasses.
+\begin{lstlisting}[language=haskell, caption=Polymorphism]
+    id :: a -> a
+    map :: (a -> b) -> [a] -> [b]
+    map f (h:t) = f h : map f t
+\end{lstlisting}
+While the "id" function can take any type, the "map" function cannot. Once a function has been bound to it, the next argument's, and the result's, type are restricted to simply the input and output types of the function.
+To ensure that the "map" function is still used correctly, the type of it's second argument must be checked, to ensure "a" is the same "a" as in the first argument.
+To mitigate this challenge, all functions will be required to define their type, whereas in Haskell, the type of "map" can be inferred from it's implementation. This will greatly simplify the type checker, as more functions will be explicitly defined.
 \section{Milestones}
-\subsection{Basic Implementation, Week 1-8}
+\subsection{Basic Implementation, Week 1-10}
 The core component of a functional languages, are the functions. Which all later features build upon. This includes functions with specific types, as well as generic functions.
 
 Certain functions, such as "+" will be implemented in JavaScript to perform the actual execution, but will still be shown as a normal typed function. This means internally functions could be represented as a pure Haskell function, or as a JavaScript function with the Haskell shown to the user. This will only need to be done for primitive operations, as all others will be able to made out of a composition of primitive operations.
@@ -121,11 +131,11 @@ Visualisation can be done with a library like Cytoscape.js \cite{cytoscape}. Thi
 \subsubsection{Steps}
 \begin{itemize}
     \item Implement a user interface, with code, input, and output fields.
-    \item Implement parsing of functions, their types.
+    \item Implement parsing of functions, their types, and bodies.
     \item Implement function application, and lazy evaluation.
     \item Display function evaluation in a visual graph-like way using Cytoscape.js.
 \end{itemize}
-\subsection{Extended Typing, Week 9-14}
+\subsection{Extended Typing, Week 11-14}
 \label{extended-typing}
 This goal will extend to user defined types, as well as define some of the functions used in Haskell's Prelude module (in which List will be defined as Cons and Nil). The key milestones for this goal will be the "data" and "type" keywords, as they allow for further definition of types in Haskell.
 \begin{lstlisting}[language=haskell, caption=Example functions/types of stage 2.]
@@ -140,14 +150,14 @@ This goal will extend to user defined types, as well as define some of the funct
     \item Implement parsing of type syntax, "data", "type", and "newtype" keywords, and type variables.
     \item Implement parsing of functions using user-defined types.
     \item Implement a variety of Prelude's built-in types.
-    \item Display type construction in a visual graph-like way.
+    \item Display type construction in a visual graph-like way using Cytoscape.js.
 \end{itemize}
-\subsection{Typeclasses and Monads, Week 15-22}
+\subsection{Typeclasses and Monads, Week 15-18}
 Lastly, monads will be implemented. This will require an IO interface, rather than just a raw input into a program. The key milestone for this goal will be the "class" keyword, as that allows for typeclasses, which monads are implemented using.
 The key feature of typeclasses is operator overloading. Many instances of the Monad typeclass exists, but the exact function used depends on the data being acted on.
 This will also allow for simplification of other functions, by using typeclasses to move the overloaded operators into, for example addition, where each numerical type can define it's own addition, which other functions can then use.
 
-At this point proper IO can be added. The interface can be modified to support both running the program as a whole, through a "main :: IO ()" function, or running a specific function. Console IO could be implemented through JavaScript modals, or new input/output boxes specifically for console IO (as running the whole program wouldn't specifically take any inputs, nor output anything). Visually IO could be shown as a simplified form of Peyton Jones' example, taking just the Console, instead of the World as an argument.
+At this point proper IO can be added. The interface can be modified to support both running the program as a whole, through a "main :: IO ()" function, or running a specific function. Console IO could be implemented through HTML's modals, or new input/output boxes specifically for console IO (as running the whole program wouldn't specifically take any inputs, nor output anything). Visually IO could be shown as a simplified form of Peyton Jones' example, taking just the Console, instead of the World as an argument.
 \begin{lstlisting}[language=haskell, caption=The Num typeclass. (+) would be implemented in JavaScript.]
   class Num n where
     (+) :: n -> n -> n
@@ -159,10 +169,10 @@ At this point proper IO can be added. The interface can be modified to support b
 \end{lstlisting}
 \subsubsection{Steps}
 \begin{itemize}
-    \item Implement parsing of typeclass syntax, "class", "instance", and "where" keywords.
-    \item Implement typeclasses for the defined types in Section \ref{extended-typing} where appropriate.
+    \item Implement parsing of typeclass syntax, "class", "instance", and "where" keywords into the parser.
+    \item Implement typeclasses for the defined types in Section \ref{extended-typing} where appropriate in Haskell.
     \item Correct identification and evaluation of the correct operator function.
-    \item Implement visually the application of typeclass functions.
+    \item Implement visually the application of typeclass functions using Cytoscape.js.
 \end{itemize}
 \printbibliography
 \end{document}
