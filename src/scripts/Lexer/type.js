@@ -13,8 +13,8 @@
            | (,{,})                         (tupling constructors)
 */
 
-let [ttype,  tbtype,  tatype,  tgtycon,  tqtycon,  ttycon,  tconid] = FunctionReference.n(
-    "ttype","tbtype","tatype","tgtycon","tqtycon","ttycon","tconid"
+let [ttype,  tbtype,  tatype,  tgtycon,  tqtycon,  ttycon] = FunctionReference.n(
+    "ttype","tbtype","tatype","tgtycon","tqtycon","ttycon"
 );
 
 ttype.set(all(tbtype, opt(all(rightArrow, ttype))));
@@ -35,9 +35,3 @@ tgtycon.set(any(
 
 tqtycon.set(ttycon);
 ttycon.set(tconid);
-
-tconid.set(merge(
-    all(large, opt(many(any(small, large, digit, quote)))),
-    Token.IDENTIFIER
-));
-

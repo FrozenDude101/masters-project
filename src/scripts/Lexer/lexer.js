@@ -101,13 +101,13 @@ function many(f) {
 
 }
 
-function reg(name, regex) {
+function reg(name, regex, tokenType = Token.NONE) {
 
     let func = (input) => {
 
         let matches = input.startsWith(regex);
         if (!matches) throw new LexerError("Invalid!");
-        input.addToken(Token.NONE, matches[0]);
+        input.addToken(tokenType, matches[0]);
         input.advance(matches[0].length);
 
         return input;

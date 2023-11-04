@@ -19,5 +19,4 @@ let large        = reg("lower", /[A-Z]/);
 let digit        = reg("digit", /[0-9]/);
 let quote        = reg("'", /'/);
 
-let reservedId   = reg("reservedId",   /(case)|(class)|(data)|(default)|(deriving)|(do)|(else)|(foreign)|(if)|(import)|(in)|(infix)|(infixl)|(infixr)|(instance)|(let)|(module)|(newtype)|(of)|(then)|(type)|(where)/, Token.IDENTIFIER);
 let reservedOp   = reg("reservedOp",   /(\.\.)|(:)|(::)|(=)|(\\)|(\|)|(<-)|(->)|(@)|(~)|(=>)/);
