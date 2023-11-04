@@ -11,10 +11,13 @@ let [tvarid,  tconid,  treservedid] = FunctionReference.n(
     "tvarid","tconid","treservedid"
 )
 
-tvarid.set(merge(
-    all(small, many(any(small, large, digit, quote))),
-    Token.IDENTIFIER
-))
+tvarid.set(diff(
+    merge(
+        all(small, many(any(small, large, digit, quote))),
+        Token.IDENTIFIER
+    ),
+    treservedid,
+));
 
 tconid.set(merge(
     all(large, many(any(small, large, digit, quote))),
