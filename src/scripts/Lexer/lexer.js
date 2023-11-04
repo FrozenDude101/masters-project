@@ -86,8 +86,7 @@ function opt(f) {
 function many(f) {
 
     let func = (input) => {
-        result = opt(all(f, many(f)))(input);
-        return result;
+        return opt(all(f, many(f)))(input);
     };
 
     let name = "many: " + f.name;
@@ -132,6 +131,8 @@ function diff(f, g) {
     return func;
 
 }
+
+let err = (input) => { throw new LexerError("Null"); };
 
 function reg(name, regex, tokenType = Token.NONE) {
 

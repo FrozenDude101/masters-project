@@ -1,6 +1,6 @@
 /*
     type   → btype [-> type]                (function type)
-    btype  → atype [btype]                  (type application)
+    btype  → [btype] atype                  (type application)
     atype  → gtycon
            | tyvar
            | ( type1 , . . . , typek )      (tuple type, k ≥ 2 )
@@ -13,8 +13,8 @@
            | (,{,})                         (tupling constructors)
 */
 
-let [ttype,  tbtype,  tatype,  tgtycon,  tqtycon,  ttycon] = FunctionReference.n(
-    "ttype","tbtype","tatype","tgtycon","tqtycon","ttycon"
+let [ttype,  tbtype,  tatype,  tgtycon] = FunctionReference.n(
+    "ttype","tbtype","tatype","tgtycon",
 );
 
 ttype.set(all(tbtype, opt(all(rightArrow, ttype))));
@@ -32,6 +32,3 @@ tgtycon.set(any(
     all(openBracket, closeBracket),
     merge(all(openParen, rightArrow, closeParen), Token.IDENTIFIER),
 ))
-
-tqtycon.set(ttycon);
-ttycon.set(tconid);
