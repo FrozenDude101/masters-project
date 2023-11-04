@@ -126,7 +126,7 @@ function reg(name, regex) {
 
 }
 
-function mergeTokens(f, tokenType) {
+function merge(f, tokenType) {
 
     let func = (input) => {
 

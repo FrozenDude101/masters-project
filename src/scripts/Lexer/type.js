@@ -30,13 +30,13 @@ tgtycon.set(any(
     tqtycon,
     all(openParen, closeParen),
     all(openBracket, closeBracket),
-    mergeTokens(all(openParen, rightArrow, closeParen), Token.IDENTIFIER),
+    merge(all(openParen, rightArrow, closeParen), Token.IDENTIFIER),
 ))
 
 tqtycon.set(ttycon);
 ttycon.set(tconid);
 
-tconid.set(mergeTokens(
+tconid.set(merge(
     all(small, opt(many(any(small, large, digit, quote)))),
     Token.IDENTIFIER
 ));
