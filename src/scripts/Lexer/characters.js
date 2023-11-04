@@ -12,16 +12,18 @@ let comma        = reg(",",      /,/);
 let semicolon    = reg(";",      /;/);
 let colon        = reg(":",      /:/);
 
-let rightArrow   = reg("->",     /->/);
-
 let hyphen       = reg("-",      /-/);
 let quote        = reg("'",      /'/);
 let speech       = reg("\"",     /"/);
 let grave        = reg("`",      /`/)
 
-let space        = reg("space",  / /);
+let ampersand    = reg("&",      /&/);
+let backslash    = reg("\\",     /\\/);
 
-let dashes       = reg("dashes", /-{2,}/)
+let dashes       = reg("dashes", /-{2,}/);
+let rightArrow   = reg("->",     /->/);
+
+let space        = reg("space",  / /);
 
 let special      = any(openParen, closeParen, comma, semicolon, openBracket, closeBracket, grave, openBrace, closeBrace);
 

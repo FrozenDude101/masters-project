@@ -5,8 +5,10 @@ function tokenize(f) {
         let result;
         if (f instanceof FunctionReference) {
             result = f.call(input.child());
-        } else {
+        } else if (f instanceof Function){
             result = f(input.child());
+        } else {
+            result = char(f)(input.child());
         }
 
         result.prependTokens(input);
@@ -148,6 +150,22 @@ function reg(name, regex, tokenType = Token.NONE) {
     };
 
     Object.defineProperty(func, "name", { value: name });
+    return func;
+
+}
+function char(c) {
+
+    let func = (input) => {
+
+        if (input.input[0] !== c) throw new LexerError("No char match!");
+        input.addToken(Token.NONE, c);
+        input.advance(1);
+
+        return input;
+
+    };
+
+    Object.defineProperty(func, "name", { value: c });
     return func;
 
 }
