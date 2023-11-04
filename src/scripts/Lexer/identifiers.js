@@ -30,14 +30,13 @@ let [treservedid,  treservedop,  tvarid,  tconid,  ttyvar,  ttycon,  ttycls,  tm
     "tqvarid","tqconid","tqtycon","tqtycls","tqvarsym","tqconsym",
 );
 
-treservedid.set(reg("reservedId",
-    /(case)|(class)|(data)|(default)|(deriving)|(do)|(else)|(foreign)|(if)|(import)|(in)|(infix)|(infixl)|(infixr)|(instance)|(let)|(module)|(newtype)|(of)|(then)|(type)|(where)/,
-    Token.IDENTIFIER
-));
-treservedop.set(reg("reservedOp",
-    /(\.\.)|(:)|(::)|(=)|(\\)|(\|)|(<-)|(->)|(@)|(~)|(=>)/,
-    Token.IDENTIFIER,
-));
+treservedid.set(merge(any(
+    "case", "class", "data", "default", "deriving", "do", "else", "foreign", "if", "import", "in",
+    "infix", "infixl", "infixr", "instance", "let", "module", "newtype", "of", "then", "type", "where",
+), Token.IDENTIFIER));
+treservedop.set(merge(any(
+    "..", ":", "::", "=", "\\", "|", "<-", "->", "@", "~", "=>",
+), Token.IDENTIFIER));
 
 tvarid.set(diff(
     merge(

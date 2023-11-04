@@ -136,23 +136,6 @@ function diff(f, g) {
 
 let err = (input) => { throw new LexerError("Null"); };
 
-function reg(name, regex, tokenType = Token.NONE) {
-
-    let func = (input) => {
-
-        let matches = input.startsWith(regex);
-        if (!matches) throw new LexerError("No regex match!");
-        input.addToken(tokenType, matches[0]);
-        input.advance(matches[0].length);
-
-        return input;
-
-    };
-
-    Object.defineProperty(func, "name", { value: name });
-    return func;
-
-}
 function str(s) {
 
     let func = (input) => {
