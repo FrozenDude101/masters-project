@@ -2,6 +2,8 @@ function tokenize(f) {
 
     let func = (input) => {
 
+        let result;
+
         if (f instanceof FunctionReference) {
             result = f.call(input.child());
         } else {
