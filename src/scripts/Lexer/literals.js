@@ -10,31 +10,31 @@
     exponent    -> (e | E) [+ | -] decimal
 */
 
-let [decimal,   octal,   hexadecimal,   integer,   float,   exponent,] = FunctionReference.n(
-    "decimal", "octal", "hexadecimal", "integer", "float", "exponent",
+let [tdecimal,   toctal,   thexadecimal,   tinteger,   tfloat,   texponent,] = FunctionReference.n(
+    "tdecimal", "toctal", "thexadecimal", "tinteger", "tfloat", "texponent",
 );
 
-decimal.set(all(digit, many(digit)));
-octal.set(all(octit, many(octit)));
-hexadecimal.set(all(hexit, many(hexit)));
+tdecimal.set(all(tdigit, many(tdigit)));
+toctal.set(all(toctit, many(toctit)));
+thexadecimal.set(all(thexit, many(thexit)));
 
-integer.set(merge(any(
-    decimal,
-    all("0", "o", octal),
-    all("0", "O", octal),
-    all("0", "x", hexadecimal),
-    all("0", "X", hexadecimal),
+tinteger.set(merge(any(
+    tdecimal,
+    all("0", "o", toctal),
+    all("0", "O", toctal),
+    all("0", "x", thexadecimal),
+    all("0", "X", thexadecimal),
 ), Token.LITERAL));
 
-float.set(merge(any(
-    all(decimal, ".", decimal, opt(exponent)),
-    all(decimal, exponent)
+tfloat.set(merge(any(
+    all(tdecimal, ".", tdecimal, opt(texponent)),
+    all(tdecimal, texponent)
 ), Token.LITERAL));
 
-exponent.set(all(
+texponent.set(all(
     any("e", "E"),
     opt(any("+", "-")),
-    decimal,
+    tdecimal,
 ));
 
 /*
@@ -57,7 +57,7 @@ let [tchar,  tstring,  tescape,  tcharesc,  tascii,  tcntrl,  tgap,] = FunctionR
 tchar.set(merge(all(
     "'",
     any(
-        diff(graphic, any("'", "/")),
+        diff(tgraphic, any("'", "/")),
         " ",
         diff(tescape, all("/", "&")),
     ),
@@ -67,7 +67,7 @@ tchar.set(merge(all(
 tstring.set(merge(all(
     "\"",
     any(
-        diff(graphic, any("\"", "\\")),
+        diff(tgraphic, any("\"", "\\")),
         " ",
         tescape,
         tgap,
@@ -76,9 +76,9 @@ tstring.set(merge(all(
 ), Token.LITERAL));
 
 tescape.set(all("\\", any(
-    tcharesc, tascii, decimal,
-    all("o", octal),
-    all("x", hexadecimal),
+    tcharesc, tascii, tdecimal,
+    all("o", toctal),
+    all("x", thexadecimal),
 )));
 
 tcharesc.set(any("a", "b", "f", "n", "r", "t", "v", "\\", "\"", "'", "&"));
@@ -88,5 +88,5 @@ tascii.set(any(
     "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC",
     "FS", "GS", "RS", "US", "SP", "DEL",
 ));
-tcntrl.set(any(large, "@", "[", "\\", "]", "^"));
-tgap.set(all("\\", whitechar, many(whitechar), "\\"));
+tcntrl.set(any(tlarge, "@", "[", "\\", "]", "^"));
+tgap.set(all("\\", twhitechar, many(twhitechar), "\\"));

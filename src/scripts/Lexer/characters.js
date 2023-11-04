@@ -20,17 +20,15 @@
 */
 
 
-let [dashes,  special,  small,  large,  symbol,  digit,  octit,  hexit,] = FunctionReference.n(
-    "dashes","special","small","large","symbol","digit","octit","hexit",
+let [tspecial,  tsmall,  tlarge,  tsymbol,  tdigit,  toctit,  thexit,] = FunctionReference.n(
+    "tspecial","tsmall","tlarge","tsymbol","tdigit","toctit","thexit",
 )
 
-dashes.set(all("--", many("-")));
+tspecial.set(any("(),;[]`{}"));
 
-special.set(any("(),;[]`{}"));
-
-small.set(any(..."_abcdefghijkmlnopqrstuvwxyz"));
-large.set(any(..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-symbol.set(any(..."!#$%&*+./<=>?@\\^|-~:"));
-digit.set(any(..."0123456789"));
-octit.set(any(..."01234567"));
-hexit.set(any(..."0123456789ABCDEFabcdef"));
+tsmall.set(any(..."_abcdefghijkmlnopqrstuvwxyz"));
+tlarge.set(any(..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+tsymbol.set(any(..."!#$%&*+./<=>?@\\^|-~:"));
+tdigit.set(any(..."0123456789"));
+toctit.set(any(..."01234567"));
+thexit.set(any(..."0123456789ABCDEFabcdef"));

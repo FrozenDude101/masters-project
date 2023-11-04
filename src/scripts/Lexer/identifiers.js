@@ -40,13 +40,13 @@ treservedop.set(merge(any(
 
 tvarid.set(diff(
     merge(
-        all(small, many(any(small, large, digit, "'"))),
+        all(tsmall, many(any(tsmall, tlarge, tdigit, "'"))),
         Token.IDENTIFIER
     ),
     treservedid,
 ));
 tconid.set(merge(
-    all(large, many(any(small, large, digit, "'"))),
+    all(tlarge, many(any(tsmall, tlarge, tdigit, "'"))),
     Token.IDENTIFIER
 ));
 ttyvar.set(tvarid);
@@ -56,15 +56,15 @@ tmodid.set(tconid);
 
 tvarsym.set(diff(
     merge(all(
-        diff(symbol, ":"),
-        many(symbol),
+        diff(tsymbol, ":"),
+        many(tsymbol),
     ), Token.IDENTIFIER),
-    any(treservedop, dashes),
+    any(treservedop, tdashes),
 ));
 tconsym.set(diff(
     merge(all(
         ":",
-        many(symbol),
+        many(tsymbol),
     ), Token.IDENTIFIER),
     any(treservedop),
 ));
