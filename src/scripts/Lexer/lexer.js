@@ -16,7 +16,6 @@ function tokenize(f) {
     }
 
     Object.defineProperty(func, "name", { value: f.name });
-
     return func;
 
 }
@@ -35,7 +34,6 @@ function all(...fs) {
 
     let name = "all: [" + fs.map(f => f.name).join(", ") + "]"
     Object.defineProperty(func, "name", { value: name });
-
     return func;
 
 }
@@ -62,7 +60,6 @@ function any(...fs) {
 
     let name = "any: [" + fs.map(f => f.name).join(", ") + "]"
     Object.defineProperty(func, "name", { value: name });
-
     return func;
 
 }
@@ -82,7 +79,6 @@ function opt(f) {
 
     let name = "opt: " + f.name;
     Object.defineProperty(func, "name", { value: name });
-
     return func;
 
 }
@@ -96,7 +92,42 @@ function many(f) {
 
     let name = "many: " + f.name;
     Object.defineProperty(func, "name", { value: name });
+    return func;
 
+}
+function diff(f, g) {
+
+    let func = (input) => {
+
+        let result = tokenize(f)(input.child());
+        let rTokens = result.tokens.map((t) => t.value);
+        result.prependTokens(input);
+
+        try {
+            let other  = tokenize(g)(input.child());
+        } catch (e) {
+            if (e instanceof LexerError) return result;
+            throw e;
+        }
+        
+        let oTokens = other.tokens.map((t) => t.value);
+
+        if (rTokens.length !== oTokens.length) {
+            return result;
+        }
+
+        for (let i = 0; i < rTokens.length; i++) {
+            if (rTokens[i] !== oTokens[i]) {
+                return result;
+            }
+        }
+
+        throw new LexerError("Tokens matched in diff.");
+
+    };
+
+    let name = `diff: [${f.name}, ${g.name}]`;
+    Object.defineProperty(func, "name", { value: name });
     return func;
 
 }
@@ -106,7 +137,7 @@ function reg(name, regex, tokenType = Token.NONE) {
     let func = (input) => {
 
         let matches = input.startsWith(regex);
-        if (!matches) throw new LexerError("Invalid!");
+        if (!matches) throw new LexerError("No regex match!");
         input.addToken(tokenType, matches[0]);
         input.advance(matches[0].length);
 
@@ -115,7 +146,6 @@ function reg(name, regex, tokenType = Token.NONE) {
     };
 
     Object.defineProperty(func, "name", { value: name });
-
     return func;
 
 }
