@@ -37,7 +37,7 @@ tqtycon.set(ttycon);
 ttycon.set(tconid);
 
 tconid.set(merge(
-    all(small, opt(many(any(small, large, digit, quote)))),
+    all(large, opt(many(any(small, large, digit, quote)))),
     Token.IDENTIFIER
 ));
 
