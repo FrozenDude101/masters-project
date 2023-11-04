@@ -103,14 +103,15 @@ function diff(f, g) {
         let rTokens = result.tokens.map((t) => t.value);
         result.prependTokens(input);
 
+        let oTokens;
         try {
-            let other  = tokenize(g)(input.child());
+            let other = tokenize(g)(input.child());
+            oTokens = other.tokens.map((t) => t.value);
         } catch (e) {
             if (e instanceof LexerError) return result;
             throw e;
         }
         
-        let oTokens = other.tokens.map((t) => t.value);
 
         if (rTokens.length !== oTokens.length) {
             return result;
