@@ -3,7 +3,6 @@ function tokenize(f) {
     let func = (input) => {
 
         let result;
-
         if (f instanceof FunctionReference) {
             result = f.call(input.child());
         } else {
@@ -27,9 +26,7 @@ function all(...fs) {
     let func = (input) => {
 
         for (let f of fs) {
-            let result = tokenize(f)(input.child());
-            result.prependTokens(input);
-            input = result;
+            input = tokenize(f)(input);
         }
 
         return input;
@@ -50,9 +47,7 @@ function any(...fs) {
 
         for (let f of fs) {
             try {
-                let result = tokenize(f)(input.child());
-                result.prependTokens(input);
-                results.push(result);
+                results.push(tokenize(f)(input));
             } catch (e) {
                 if (e instanceof LexerError) continue;
                 throw e;
@@ -76,9 +71,7 @@ function opt(f) {
     let func = (input) => {
 
         try {
-            let result = tokenize(f)(input.child());
-            result.prependTokens(input);
-            input = result;
+            input = tokenize(f)(input);
         } catch (e) {
             if (!(e instanceof LexerError)) throw e;
         } finally {
@@ -97,8 +90,7 @@ function opt(f) {
 function many(f) {
 
     let func = (input) => {
-        result = opt(all(f, many(f)))(input.child());
-        result.prependTokens(input);
+        result = opt(all(f, many(f)))(input);
         return result;
     };
 
@@ -132,7 +124,7 @@ function merge(f, tokenType) {
 
     let func = (input) => {
 
-        let result = tokenize(f)(input.child());
+        let result = tokenize(f)(input);
         let tokenValue = result.tokens.reduce((a, t) => a + t.value, "");
         let token = new Token(tokenType, tokenValue, [...result.tokens[0].pos]);
 
