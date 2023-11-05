@@ -1,4 +1,6 @@
 /*
+    special -> ( | ) | , | ; | [ | ] | ` | { | }
+
     small     -> ascSmall | uniSmall | _
     ascSmall  -> a | b | . . . | z
     uniSmall  -> any Unicode lowercase letter

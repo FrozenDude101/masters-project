@@ -11,8 +11,10 @@ function tokenize(f) {
             result = str(f)(input.child());
         }
 
-        result.prependTokens(input);
+        console.log(input.input, f.name ? f.name : f);
 
+        result.prependTokens(input);
+        
         return result;
 
     }
