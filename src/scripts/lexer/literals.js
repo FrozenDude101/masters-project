@@ -10,31 +10,31 @@
     exponent    -> (e | E) [+ | -] decimal
 */
 
-let [tdecimal,   toctal,   thexadecimal,   tinteger,   tfloat,   texponent,] = FunctionReference.n(
-    "tdecimal", "toctal", "thexadecimal", "tinteger", "tfloat", "texponent",
+let [t_decimal, t_octal, t_hexadecimal, t_integer, t_float, t_exponent,] = FunctionReference.n(
+      "decimal", "octal", "hexadecimal", "integer", "float", "exponent",
 );
 
-tdecimal.set(all(tdigit, many(tdigit)));
-toctal.set(all(toctit, many(toctit)));
-thexadecimal.set(all(thexit, many(thexit)));
+t_decimal.set(all(t_digit, many(t_digit)));
+t_octal.set(all(t_octit, many(t_octit)));
+t_hexadecimal.set(all(t_hexit, many(t_hexit)));
 
-tinteger.set(tok(any(
-    tdecimal,
-    all("0", "o", toctal),
-    all("0", "O", toctal),
-    all("0", "x", thexadecimal),
-    all("0", "X", thexadecimal),
+t_integer.set(tok(any(
+    t_decimal,
+    all("0", "o", t_octal),
+    all("0", "O", t_octal),
+    all("0", "x", t_hexadecimal),
+    all("0", "X", t_hexadecimal),
 ), Token.LITERAL));
 
-tfloat.set(tok(any(
-    all(tdecimal, ".", tdecimal, opt(texponent)),
-    all(tdecimal, texponent)
+t_float.set(tok(any(
+    all(t_decimal, ".", t_decimal, opt(t_exponent)),
+    all(t_decimal, t_exponent)
 ), Token.LITERAL));
 
-texponent.set(all(
+t_exponent.set(all(
     any("e", "E"),
     opt(any("+", "-")),
-    tdecimal,
+    t_decimal,
 ));
 
 /*
@@ -50,43 +50,43 @@ texponent.set(all(
     gap     -> \ whitechar {whitechar} \
 */
 
-let [tchar,  tstring,  tescape,  tcharesc,  tascii,  tcntrl,  tgap,] = FunctionReference.n(
-    "tchar","tstring","tescape","tcharesc","tascii","tcntrl","tgap",
+let [t_char, t_string, t_escape, t_charesc, t_ascii, t_cntrl, t_gap,] = FunctionReference.n(
+      "char", "string", "escape", "charesc", "ascii", "cntrl", "gap",
 );
 
-tchar.set(tok(all(
+t_char.set(tok(all(
     "'",
     any(
-        diff(tgraphic, any("'", "/")),
+        diff(t_graphic, any("'", "/")),
         " ",
-        diff(tescape, all("/", "&")),
+        diff(t_escape, all("/", "&")),
     ),
     "'",
 ), Token.LITERAL));
 
-tstring.set(tok(all(
+t_string.set(tok(all(
     "\"",
-    any(
-        diff(tgraphic, any("\"", "\\")),
-        " ",
-        tescape,
-        tgap,
-    ),
+    many(any(
+        diff(t_graphic, any("\"", "\\")),
+        t_space,
+        t_escape,
+        t_gap,
+    )),
     "\"",
 ), Token.LITERAL));
 
-tescape.set(all("\\", any(
-    tcharesc, tascii, tdecimal,
-    all("o", toctal),
-    all("x", thexadecimal),
+t_escape.set(all("\\", any(
+    t_charesc, t_ascii, t_decimal,
+    all("o", t_octal),
+    all("x", t_hexadecimal),
 )));
 
-tcharesc.set(any("a", "b", "f", "n", "r", "t", "v", "\\", "\"", "'", "&"));
-tascii.set(any(
-    all("^", tcntrl),
+t_charesc.set(any("a", "b", "f", "n", "r", "t", "v", "\\", "\"", "'", "&"));
+t_ascii.set(any(
+    all("^", t_cntrl),
     "NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS", "HT", "LF", "VT", "FF", "CR",
     "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC",
     "FS", "GS", "RS", "US", "SP", "DEL",
 ));
-tcntrl.set(any(tlarge, "@", "[", "\\", "]", "^"));
-tgap.set(all("\\", twhitechar, many(twhitechar), "\\"));
+t_cntrl.set(any(t_large, "@", "[", "\\", "]", "^"));
+t_gap.set(all("\\", t_whitechar, many(t_whitechar), "\\"));
