@@ -21,11 +21,25 @@ class LexerInput {
         );
 
     }
+    clone() {
+
+        return new LexerInput(
+            [...this.input],
+            [...this.tokens],
+            this.index,
+        )
+
+    }
 
     addToken(type, value) {
 
         let token = new Token(type, value);
         this.tokens.push(token);
+
+    }
+    appendTokens(lI) {
+
+        this.tokens.push(...lI);
 
     }
     prependTokens(lI) {
@@ -55,6 +69,9 @@ class LexerInput {
 
         return `I: ${this.input.slice(this.index).join("")}\nT: ${this.tokens.map(t => `(${t.type}, ${t.value})`)}\nP: ${this.index}`
 
+    }
+    hash() {
+        return this.input.slice(this.index).join("");
     }
 
 }

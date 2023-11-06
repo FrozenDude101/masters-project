@@ -1,5 +1,7 @@
 class Lexer {
 
+    static cache = {};
+
     static lexer(f) {
 
         let func = (inputs) => {
@@ -8,23 +10,31 @@ class Lexer {
             
             let results = [];
             for (let input of inputs) {
-                try {
-                    let result;
-                    if (f instanceof FunctionReference) result = f.call(input.child());
-                    else if (f instanceof Function)     result = f(input.child());
-                    else                                result = this.str(f)(input.child());
 
-                    if (!Array.isArray(result)) result = [result];
-                    result = result.flat();
-
-                    for (let r of result) {
-                        r.prependTokens(input);
-                        results.push(r);
+                if (input.hash() && this.cache[name][input.hash()]) {
+                    for (let lI of this.cache[name][input.hash()]) {
+                        lI = lI.clone();
+                        lI.prependTokens(input);
+                        results.push(lI);
                     }
-                } catch (e) {
-                    if (e instanceof LexerError) continue;
-                    throw (e);
+                    continue;
                 }
+
+                let result;
+                if (f instanceof FunctionReference) result = f.call(input.child());
+                else if (f instanceof Function)     result = f(input.child());
+                else                                result = this.str(f)(input.child());
+
+                if (!Array.isArray(result)) result = [result];
+                result = result.flat();
+
+                this.cache[name][input.hash()] = [];
+                for (let r of result) {
+                    r.prependTokens(input);
+                    results.push(r);
+                    this.cache[name][input.hash()].push(r.clone());
+                }
+
             }
 
             return results;
@@ -32,6 +42,8 @@ class Lexer {
         };
     
         let name = f.name ? f.name : f;
+        if (!this.cache[name]) this.cache[name] = {};
+
         Object.defineProperty(func, "name", { value: name });
         return func;
     
@@ -49,7 +61,7 @@ class Lexer {
 
         }
 
-        let name = `all: ${fs.map(f => (f.name ? f.name : f))}`;
+        let name = `all: [${fs.map(f => (f.name ? f.name : f)).join(", ")}]`;
         Object.defineProperty(func, "name", { value: name });
         return func;
 
@@ -234,14 +246,32 @@ class LexerError extends Error {}
 
 function test(t, input) {
 
+    let t1 = performance.now();
+
     let LOs = Lexer.lexer(t)(LexerInput.fromInput(input));
     console.log(`${LOs.length} successful run${LOs.length === 1 ? "" : "s"}.`);
-    for (let LO of LOs) {
-        console.log(""+LO+"\n\n");
+    console.log(`${LOs[0].tokens.map((t) => "(" + t.type + ", " + t.value + ")").join("")}`);
 
-        LO.tokens = LO.tokens.filter((t) => t.type !== Token.NONE);
-        console.log(""+LO);
-    }
+    let t2 = performance.now();
+
+    console.log("Took ", (t2-t1)/1000);
+    document.getElementById("time").innerText = `Time Taken: ${(t2-t1)/1000}s.`
+
+    let div = document.getElementById("tokens");
+    div.innerHTML = "";
+    printTokens(LOs[0].tokens);
+
+}
+
+function printTokens(ts) {
+
+    if (!ts.length) return;
+
+    let div = document.getElementById("tokens");
+    let t = ts[0];
+    if ([...t.value].includes("\n")) div.innerHTML += "<br>".repeat(t.value.split("\n").length - 1);
+    if (![Token.NONE, Token.WHITESPACE].includes(t.type)) div.innerHTML += `${t.value}, `;
+    setTimeout(() => printTokens(ts.slice(1)), 0);
 
 }
 

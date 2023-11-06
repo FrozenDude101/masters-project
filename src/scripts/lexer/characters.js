@@ -26,7 +26,7 @@ let [t_special, t_small, t_large, t_symbol, t_digit, t_octit, t_hexit,] = Functi
       "special", "small", "large", "symbol", "digit", "octit", "hexit",
 )
 
-t_special.set(any(..."(),;[]`{}"));
+t_special.set(tok(any(..."(),;[]`{}"), Token.SPECIAL));
 
 t_small.set(any(..."_abcdefghijkmlnopqrstuvwxyz"));
 t_large.set(any(..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"));

@@ -22,10 +22,10 @@ let [t_comment, t_dashes, t_opencom, t_closecom, t_ncomment, t_ANYseq, t_ANY, t_
       "comment", "dashes", "opencom", "closecom", "ncomment", "ANYseq", "ANY", "any", "graphic",
 )
 
-t_whitespace.set(all(t_whitestuff, many(t_whitestuff)));
+t_whitespace.set(tok(all(t_whitestuff, many(t_whitestuff)), Token.WHITESPACE));
 t_whitestuff.set(any(t_whitechar, t_comment, t_ncomment));
 t_whitechar.set(any(t_newline, t_vertab, t_space, t_tab));
-t_newline.set(any(all(t_return, t_linefeed), t_return, t_linefeed, t_formfeed));
+t_newline.set(tok(any(all(t_return, t_linefeed), t_return, t_linefeed, t_formfeed), Token.NEWLINE));
 t_return.set(str("\r"));
 t_linefeed.set(str("\n"));
 t_vertab.set(str("\v"));

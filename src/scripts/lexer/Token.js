@@ -19,6 +19,9 @@ class Token {
     static OP         = "op";
     static LITERAL    = "literal";
 
+    static SPECIAL    = "special";
+    static NEWLINE    = "newline";
+
     constructor(type, value) {
 
         this.type = type;
