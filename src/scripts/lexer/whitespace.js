@@ -63,11 +63,11 @@ t_ncomment.set(tok(all(
 ), Token.COMMENT));
 
 t_ANYseq.set(all(diff(
-    many(t_any), 
+    many(t_ANY), 
     all(
-        many(t_any),
+        many(t_ANY),
         any(t_opencom, t_closecom), 
-        many(t_any)
+        many(t_ANY)
     )
 )));
 t_ANY.set(any(

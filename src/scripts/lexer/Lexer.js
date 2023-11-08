@@ -11,15 +11,6 @@ class Lexer {
             let results = [];
             for (let input of inputs) {
 
-                if (input.hash() && this.cache[name][input.hash()]) {
-                    for (let lI of this.cache[name][input.hash()]) {
-                        lI = lI.clone();
-                        lI.prependTokens(input);
-                        results.push(lI);
-                    }
-                    continue;
-                }
-
                 let result;
                 if (f instanceof FunctionReference) result = f.call(input.child());
                 else if (f instanceof Function)     result = f(input.child());
