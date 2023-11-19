@@ -20,7 +20,7 @@ function run() {
         parse(tokens2);
     } catch (e) {
         document.getElementById("parsed").innerHTML = `
-            ${e}>br>
+            ${e}<br>
             At: ${e.index === null ? "End of Input" : e.index}.
         `;
         return;
