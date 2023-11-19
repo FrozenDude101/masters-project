@@ -34,11 +34,11 @@ function parsePattern(tokens) {
                 terms.push(node);
                 break;
             case Token.OP:
-                if (t.value !== "=") throw `Unexpected operator '${t.value}' in pattern match.`;
+                if (t.value !== "=") throw new ParserError(`Unexpected operator '${t.value}' in pattern match.`, t.index, t.length);
                 return terms;
         }
     }
 
-    throw "Expected '=' to signify end of pattern match.";
+    throw new ParserError(`Expected '=' at end of pattern match.`, null, null);
 
 }

@@ -9,3 +9,13 @@ function parse(tokens) {
     }    
 
 }
+
+class ParserError extends Error {
+
+    constructor(message, index, length) {
+        super(message);
+        this.index = index;
+        this.length = length;
+    }
+
+}

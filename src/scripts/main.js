@@ -20,9 +20,8 @@ function run() {
         parse(tokens2);
     } catch (e) {
         document.getElementById("parsed").innerHTML = `
-            Encountered error while parsing:
-            <br>${e}
-            <br>At: ${tokens2[0] === undefined ? "End of Input" : tokens2[0].index-1}.
+            ${e}>br>
+            At: ${e.index === null ? "End of Input" : e.index}.
         `;
         return;
     }

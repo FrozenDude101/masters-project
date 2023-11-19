@@ -49,7 +49,7 @@ function parseType(tokens, endChar = "\n") {
                 type = type === null ? node : new TypeNode(TypeNode.TYAPP, null, [type, node]);
                 break;
             case Token.OP:
-                if (t.value !== "->") throw new SyntaxError(t.index);
+                if (t.value !== "->") throw new ParserError(`Unexpected ${t.value}.`, t.index, t.value.length);
                 node = parseType(tokens, endChar);
                 if (node === null) {
                     throw "Expected type variable, or type constructor.";
@@ -72,17 +72,17 @@ function parseType(tokens, endChar = "\n") {
                     case "[":
                         node = parseType(tokens, "]");
                         tokens.shift();
-                        if (node === null) throw "Expected type in list type."
+                        if (node === null) throw new ParserError("Expected type in list type.", t.index, 2);
                         node = new TypeNode(TypeNode.LIST, null, [node]);
                         type = type === null ? node : new TypeNode(TypeNode.TYAPP, null, [type, node]);
                         break;
 
                     default:
-                        throw `Unexpected ${t.value}.`;
+                        throw new ParserError(`Unexpected ${t.value}.`, t.index, t.value.length);
                 }
         }
     }
 
-    throw "Expected " + (endChar === "\n" ? "\\n" : endChar);
+    throw new ParserError(`Expected ${endChar === "\n" ? "newline" : endChar}.`, null, null);
 
 }

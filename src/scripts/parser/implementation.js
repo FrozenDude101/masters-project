@@ -56,9 +56,7 @@ function parseImplementation(tokens, endChar = "\n") {
             case Token.OP:
             case Token.VARSYM:
                 node = parseImplementation(tokens, endChar);
-                if (node === null) {
-                    throw "Expected expression.";
-                }
+                if (node === null) throw new ParserError(`Expected expression after operator / symbol.`, t.index, t.value.length);
                 impl = new ImplNode(ImplNode.INFIX, t.value, [impl, node]);
                 break;
             case Token.SPECIAL:
@@ -75,11 +73,11 @@ function parseImplementation(tokens, endChar = "\n") {
                         break;
 
                     default:
-                        throw `Unexpected ${t.value}.`;
+                        throw new ParserError(`Unexpected ${t.value}.`, t.index, t.value.length);
                 }
         }
     }
 
-    throw "Expected " + (endChar === "\n" ? "\\n" : endChar);
+    throw new ParserError(`Expected ${endChar === "\n" ? "newline" : endChar}.`, null, null);
 
 }
