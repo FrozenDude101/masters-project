@@ -22,10 +22,11 @@ class Token {
     static SPECIAL    = "special";
     static NEWLINE    = "newline";
 
-    constructor(type, value) {
+    constructor(type, value, index = 0) {
 
         this.type = type;
         this.value = value;
+        this.index = index;
 
     }
 

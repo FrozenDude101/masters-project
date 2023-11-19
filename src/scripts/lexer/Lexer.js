@@ -1,7 +1,5 @@
 class Lexer {
 
-    static cache = {};
-
     static lexer(f) {
 
         let func = (inputs) => {
@@ -19,11 +17,9 @@ class Lexer {
                 if (!Array.isArray(result)) result = [result];
                 result = result.flat();
 
-                this.cache[name][input.hash()] = [];
                 for (let r of result) {
                     r.prependTokens(input);
                     results.push(r);
-                    this.cache[name][input.hash()].push(r.clone());
                 }
 
             }
@@ -33,7 +29,6 @@ class Lexer {
         };
     
         let name = f.name ? f.name : f;
-        if (!this.cache[name]) this.cache[name] = {};
 
         Object.defineProperty(func, "name", { value: name });
         return func;
@@ -235,36 +230,6 @@ class Lexer {
 
 class LexerError extends Error {}
 
-function test(t, input) {
-
-    let t1 = performance.now();
-
-    let LOs = Lexer.lexer(t)(LexerInput.fromInput(input));
-    console.log(`${LOs.length} successful run${LOs.length === 1 ? "" : "s"}.`);
-    console.log(`${LOs[0].tokens.map((t) => "(" + t.type + ", " + t.value + ")").join("")}`);
-
-    let t2 = performance.now();
-
-    console.log("Took ", (t2-t1)/1000);
-    document.getElementById("time").innerText = `Time Taken: ${(t2-t1)/1000}s.`
-
-    let div = document.getElementById("tokens");
-    div.innerHTML = "";
-    printTokens(LOs[0].tokens);
-
-}
-
-function printTokens(ts) {
-
-    if (!ts.length) return;
-
-    let div = document.getElementById("tokens");
-    let t = ts[0];
-    if ([...t.value].includes("\n")) div.innerHTML += "<br>".repeat(t.value.split("\n").length - 1);
-    if (![Token.NONE, Token.WHITESPACE].includes(t.type)) div.innerHTML += `${t.value}, `;
-    setTimeout(() => printTokens(ts.slice(1)), 0);
-
-}
 
 all   = Lexer.all.bind(Lexer);
 any   = Lexer.any.bind(Lexer);

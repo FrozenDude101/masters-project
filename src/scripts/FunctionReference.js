@@ -31,7 +31,7 @@ class FunctionReference {
             return this.function.call(...args);
         }
 
-        return this.function(...args);;
+        return this.function(...args);
 
     }
 

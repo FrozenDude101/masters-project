@@ -33,7 +33,7 @@ class LexerInput {
 
     addToken(type, value) {
 
-        let token = new Token(type, value);
+        let token = new Token(type, value, this.index - value.length);
         this.tokens.push(token);
 
     }
