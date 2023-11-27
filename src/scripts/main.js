@@ -26,6 +26,12 @@ function run() {
         return;
     }
 
+    document.getElementById("parsed").innerHTML += `
+        {A B} is application, where B is applied to A.<br>
+        (A B C) is an infix operator, where A and C are the operands.<br>
+        <br>
+    `;
+
     for (let f in p.functions) {
         let type = p.functions[f].type;
         let patterns = p.functions[f].patterns;

@@ -22,7 +22,7 @@ class ImplNode {
             case ImplNode.CONID:
                 return this.value;
             case ImplNode.APP:
-                return `(${this.children[0]} ${this.children[1]})`;
+                return `{${this.children[0]} ${this.children[1]}}`;
             case ImplNode.INFIX:
                 return `(${this.children[0]} ${this.value} ${this.children[1]})`;
         }
@@ -56,7 +56,7 @@ function parseImplementation(tokens, endChar = "\n") {
             case Token.OP:
             case Token.VARSYM:
                 node = parseImplementation(tokens, endChar);
-                if (node === null) throw new ParserError(`Expected expression after operator / symbol.`, t.index, t.value.length);
+                if (node === null) throw new ParserError(`Expected expression after operator/symbol.`, t.index, t.value.length);
                 impl = new ImplNode(ImplNode.INFIX, t.value, [impl, node]);
                 break;
             case Token.SPECIAL:

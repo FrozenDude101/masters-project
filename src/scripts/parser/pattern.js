@@ -1,5 +1,6 @@
 class PatternNode {
 
+    static LITERAL = "literal";
     static VAR = "var";
 
     constructor(type, value, children) {
@@ -13,6 +14,7 @@ class PatternNode {
     toString() {
 
         switch (this.type) {
+            case PatternNode.LITERAL:
             case PatternNode.VAR:
                 return this.value;
         }
@@ -31,6 +33,10 @@ function parsePattern(tokens) {
         switch (t.type) {
             case Token.VARID:
                 node = new PatternNode(PatternNode.VAR, t.value, []);
+                terms.push(node);
+                break;
+            case Token.LITERAL:
+                node = new PatternNode(PatternNode.LITERAL, t.value, []);
                 terms.push(node);
                 break;
             case Token.OP:

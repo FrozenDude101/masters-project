@@ -21,7 +21,7 @@ class TypeNode {
             case TypeNode.TYCON:
                 return this.value;
             case TypeNode.TYAPP:
-                return `(${this.children[0]} ${this.children[1]})`;
+                return `{${this.children[0]} ${this.children[1]}}`;
             case TypeNode.ARROW:
                 return `(${this.children[0]} -> ${this.children[1]})`;
             case TypeNode.LIST:
