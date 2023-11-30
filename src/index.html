@@ -34,26 +34,12 @@
 
     <body>
         <textarea rows=40 cols=70 id = "ta">
-id :: a -> a
-id a = a
-
 add :: Integer -> Integer -> Integer
 add a b = a + b
-
-multiply :: Integer -> Integer -> Integer
-multiply 0 _ = 0
-multiply a b = a + multiply a (b-1)
-
-badMult :: Integer -> Integer -> Integer
-badMult 0 _ = 0
-badMult a b = a + badMult a b-1
-
-infixAndApps :: Integer -> Integer
-infixAndApps a = add a a - multiply a a * id a
 </textarea>
         <br>
         <button onclick="run()">Lex</button>
-        <div id="time" style="font-family: monospace;"></div>
+        <button onclick="step()">Step</button>
         <div id="parsed" style="font-family: monospace; position: absolute; top: 25px; left: 575px; "></div>
     </body>
 

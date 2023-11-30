@@ -2,19 +2,20 @@ class EThunk {
 
     static APPLICATION        = "Application";
     static FUNCTION           = "Function";
-    static PARTIAL_FUNCTION   = "PartialFunction";
     static ARGUMENT           = "Argument";
     static LITERAL_ARGUMENT   = "LiteralArgument";
     static UNBOUND            = "Unbound";
     static LITERAL            = "Literal";
     static JAVASCRIPT         = "JavaScript";
-    static PARTIAL_JAVASCRIPT = "PartialJavaScript";
 
 }
 
 class Thunk {
 
     replaceUnboundThunks(fT, args) {
+        return this;
+    }
+    rebindUnboundThunks(before, after) {
         return this;
     }
 
@@ -38,7 +39,6 @@ class ApplicationThunk extends Thunk {
             case EThunk.APPLICATION:
                 return new ApplicationThunk(this.t1.step(), this.t2);
             case EThunk.FUNCTION:
-            case EThunk.PARTIAL_FUNCTION:
                 return this.t1.bind(this.t2);
             case EThunk.ARGUMENT:
             case EThunk.LITERAL_ARGUMENT:
@@ -48,14 +48,22 @@ class ApplicationThunk extends Thunk {
             case EThunk.LITERAL:
                 throw new ThunkError("Literal thunk cannot be applied to.");
             case EThunk.JAVASCRIPT:
-            case EThunk.PARTIAL_JAVASCRIPT:
-                return this.t1.bind(this.t2);
+                let vals = this.t1.bind(this.t2);
+                if (vals[0])
+                    return vals[1];
+                this.t2 = vals[1];
+                return this;
         }
     }
 
     replaceUnboundThunks(fT, args) {
         this.t1 = this.t1.replaceUnboundThunks(fT, args);
         this.t2 = this.t2.replaceUnboundThunks(fT, args);
+        return this;
+    }
+    rebindUnboundThunks(before, after) {
+        this.t1 = this.t1.rebindUnboundThunks(before, after);
+        this.t2 = this.t2.rebindUnboundThunks(before, after);
         return this;
     }
 
@@ -86,74 +94,30 @@ class FunctionThunk extends Thunk {
     }
 
     bind(t2) {
-        let partial = new PartialFunctionThunk(this);
-        partial.bind(t2);
-        return partial;
-    }
-
-    call(...args) {
-        let impl, replacements;
+        let c = new FunctionThunk(`${this.name}$${t2}`);
         for (let i = 0; i < this.patterns.length; i++) {
-            replacements = patternMatch(this.patterns[i], args);
+            let pattern = this.patterns[i];
+            let replacements = patternMatch(pattern, t2);
             if (replacements) {
-                impl = this.impls[i];
-                break;
+                let impl = this.impls[i]
+                    .clone()
+                    .replaceUnboundThunks(this, replacements)
+                    .rebindUnboundThunks(this, c);
+                if (pattern.length === 1)
+                    return impl;
+                c.setPattern(...pattern.slice(1), impl);
             }
         }
-
-        if (!impl)
-            throw new ThunkError("No pattern match found.");
-
-        impl = impl.clone().replaceUnboundThunks(this, replacements);
-        return impl;
+        return c;
     }
 
-    step() {
-        return this.call();
+    rename(name) {
+        this.name = name;
+        return this;
     }
 
     toString() {
         return this.name;
-    }
-
-}
-
-class PartialFunctionThunk extends Thunk {
-
-    type = EThunk.PARTIAL_FUNCTION;
-
-    constructor(fT) {
-        super();
-        this.fT = fT;
-        this.args = [];
-    }
-    clone() {
-        let clonedPFT = new PartialFunctionThunk(this.fT);
-        for (let a of this.args) {
-            clonedPFT.bind(a.clone());
-        }
-        return clonedPFT;
-    }
-
-    bind(t2) {
-        this.args.push(t2);
-        return this;
-    }
-
-    step() {
-        return this.fT.call(...this.args);
-    }
-
-    replaceUnboundThunks(fT, args) {
-        this.args = this.args.map(t => t.replaceUnboundThunks(fT, args));
-    }
-
-    toString() {
-        let s = this.fT.name;
-        for (let a of this.args) {
-            s = `{${s} ${a}}`;
-        }
-        return s;
     }
 
 }
@@ -213,9 +177,14 @@ class UnboundThunk extends Thunk {
 
         return args[this.symbol];
     }
+    rebindUnboundThunks(before, after) {
+        if (this.boundTo === before)
+            this.boundTo = after;
+        return this;
+    }
 
     toString() {
-        return this.value;
+        return this.symbol;
     }
 
 }
@@ -256,22 +225,16 @@ class JSThunk extends Thunk {
     }
 
     bind(t2) {
-        let p = new PartialJSThunk(this);
-        p.bind(t2);
-        return p;
-    }
+        t2 = t2.step();
+        if (t2 instanceof Thunk) 
+            return [false, t2];
 
-    call(...args) {
-        for (let i = 0; i < args.length; i++) {
-            while (args[i] instanceof Thunk) {
-                args[i] = args[i].step();
-            }
-        }
-        return new LiteralThunk(this.f(...args));
-    }
+        let fv = this.f(t2);
 
-    step() {
-        return this.call();
+        if (fv instanceof Function)
+            return [true, new JSThunk(`${this.name}$${t2}`, fv)];
+
+        return [true, new LiteralThunk(fv)];
     }
 
     toString() {
@@ -280,69 +243,29 @@ class JSThunk extends Thunk {
 
 }
 
-class PartialJSThunk extends Thunk {
-
-    type = EThunk.JAVASCRIPT;
-
-    constructor(jsT) {
-        super();
-        this.jsT = jsT;
-        this.args = [];
-    }
-    clone() {
-        let clonedPJST = new PartialJSThunk(this.fT);
-        for (let a of this.args) {
-            clonedPJST.bind(a.clone());
-        }
-        return clonedPJST;
-    }
-
-    bind(t2) {
-        this.args.push(t2);
-        return this;
-    }
-
-    step() {
-        return this.jsT.call(...this.args);
-    }
-
-    replaceUnboundThunks(fT, args) {
-        this.args = this.args.map(t => t.replaceUnboundThunks(fT, args));
-    }
-
-    toString() {
-        let s = this.jsT.name;
-        for (let a of this.args) {
-            s = `{${s} ${a}}`;
-        }
-        return s;
-    }
-
-}
-
 class ThunkError extends Error {}
 
 
-function patternMatch(pattern, args) {
+function patternMatch(pattern, arg) {
     let replacements = {};
-    
-    for (let i = 0; i < pattern.length; i++) {
-        let p = pattern[i];
-        let arg = args[i];
 
-        switch (p.type) {
-            case EThunk.ARGUMENT:
-                replacements[p.symbol] = arg;
-                break;
-            case EThunk.LITERAL_ARGUMENT:
-                if (arg.type !== EThunk.LITERAL)
-                    return false;
-                if (p.value !== arg.value)
-                    return false;
-                break;
-            default:
+    let p = pattern[0];
+    switch (p.type) {
+        case EThunk.ARGUMENT:
+            replacements[p.symbol] = arg;
+            break;
+        case EThunk.LITERAL_ARGUMENT:
+            while (arg instanceof Thunk) {
+                arg = arg.step();
+            }
+            arg = new LiteralThunk(arg);
+            if (arg.type !== EThunk.LITERAL)
                 return false;
-        }
+            if (p.value !== arg.value)
+                return false;
+            break;
+        default:
+            return false;
     }
 
     return replacements;

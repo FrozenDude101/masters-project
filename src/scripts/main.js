@@ -48,3 +48,15 @@ function run() {
     }
 
 }
+
+function step() {
+
+    let box = document.getElementById("parsed");
+
+    box.innerHTML = "";
+
+    x = x.step();
+
+    box.innerHTML = ""+x;
+
+}

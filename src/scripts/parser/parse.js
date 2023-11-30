@@ -6,7 +6,9 @@ function parse(tokens) {
         parseDeclarations(tokens);
 
         while (tokens[0]?.value === "\n") tokens.shift();
-    }    
+    }
+
+    p.convertToThunks();
 
 }
 

@@ -21,6 +21,17 @@ class PatternNode {
 
     }
 
+    toThunk() {
+
+        switch (this.type) {
+            case PatternNode.LITERAL:
+                return new LiteralArgumentThunk(parseInt(this.value));
+            case PatternNode.VAR:
+                return new ArgumentThunk(this.value);
+        }
+
+    }
+
 }
 
 function parsePattern(tokens) {

@@ -31,6 +31,35 @@ class ImplNode {
 
     }
 
+    toThunk(fT) {
+
+        switch (this.type) {
+            case ImplNode.LITERAL:
+                return new LiteralThunk(parseInt(this.value));
+            case ImplNode.VARID:
+                if (Program.contains(this.value))
+                    return Program.get(this.value);
+                return new UnboundThunk(fT, this.value);
+            case ImplNode.APP:
+                return new ApplicationThunk(
+                    this.children[0].toThunk(fT),
+                    this.children[1].toThunk(fT),
+                );
+            case ImplNode.INFIX:
+                return new ApplicationThunk(
+                    new ApplicationThunk(
+                        Program.get("(" + this.value + ")"),
+                        this.children[0].toThunk(fT),
+                    ),
+                    this.children[1].toThunk(fT),
+                );
+            default:
+                throw "Womp Womp";
+
+        }
+
+    }
+
 }
 
 function parseImplementation(tokens, endChar = "\n") {
