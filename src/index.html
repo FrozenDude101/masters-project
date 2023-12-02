@@ -3,6 +3,11 @@
 <html>
 
     <head>
+        <link rel="stylesheet" href="style.css">
+
+        <script src="scripts/arguments.js" defer></script>
+        <script src="scripts/highlighting.js" defer></script>
+        <script src="scripts/ui.js" defer></script>
 
         <script src = "scripts/FunctionReference.js" defer></script>
         
@@ -27,36 +32,63 @@
         <script src = "scripts/interpreter/Thunk.js" defer></script>
         <script src = "scripts/interpreter/Prelude.js" defer></script>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.27.0/cytoscape.min.js" integrity="sha512-ZNCw/dHSJygOg60ih5fI0f2RKqa8EeVm2ivm3PcrD6SEv2WzK8VJoe5IxS4QzvLcaSIQeaxgZMRCW01QlVJTZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
         <script src = "scripts/main.js" defer></script>
 
     </head>
 
-    <body>
-        <textarea rows=40 cols=70 id = "ta">
+    <body id="body">
+        <div id="input-container">
+            <div>
+                <div id="backdrop">
+                    <div class="highlight-sync" id="highlights">
+                    </div>
+                </div>
+                <textarea class="highlight-sync" id="code-input" rows=25 cols=50>id :: a -> a
+id a = a
+
 add :: Integer -> Integer -> Integer
 add a b = a + b
-</textarea>
-        <br>
-        <button onclick="run()">Lex</button>
-        <button onclick="step()">Step</button>
-        <div id="parsed" style="font-family: monospace; position: absolute; top: 25px; left: 575px; "></div>
+
+multiply :: Integer -> Integer -> Integer
+multiply 0 b = 0
+multiply a b = add b (multiply (pred a) b)</textarea>
+            </div>
+            <div id="error-container">
+                <span class="literal-span"> </span>
+            </div>
+            <select id="function-selector">
+                <option>Wait for first parse.</option>
+            </select>
+            <div>
+                <span class="title literal-span">Return Type: </span>
+                <input id="return-type" disabled>
+            </div>
+            <div>
+                <span class="title">Return Value:</span>
+                <input id="return-value" disabled>
+            </div>
+            <div>
+                <span class="title" id="argument-title">
+                    Arguments (<span id="argument-count">0</span><span id="required-argument-count"></span>):
+                </span>
+                <button id="add-argument" onclick="addArgument()">+</button>
+                <button id="remove-argument" onclick="removeArgument()" disabled>-</button>
+            </div>
+            <div id="argument-container">
+            </div>
+            <div id="controls">
+                <button onclick="run()">Run</button>
+                <button onclick="start()">Start</button>
+                <button onclick="step()">Step</button>
+                <button onclick="stop()">Stop</button>
+                <button onclick="reset()">Reset</button>
+            </div>
+        </div>
+        <div id="ctyoscape-container">
+
+        </div>
     </body>
 
 </html>
-
-<!-- Code that breaks GHC, seems to be becaused of the $ symbol.
-multiply :: Integer -> Integer -> Integer
-multiply a 0 = 0
-multiply a b = a + (multiply a $) b-1
-
-main = print $ multiply 10 10
-
-Turns out this is because (multiply a $) returns a regular function.
-This then bound to b.
-
-a + (multiply a $) b-1
-a + {({multiply a} $) b} - 1
-
-and multiply a b is therefore infinitely recursive
--->

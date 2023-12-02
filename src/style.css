@@ -1,0 +1,96 @@
+* {
+    font-family: monospace;
+}
+.literal-span {
+    white-space: pre;
+}
+.title {
+    color: white;
+}
+
+#body {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+
+    margin: 5px;
+    width: calc(100vw - 10px);
+    height: calc(100vh - 10px);
+
+    background-color: #222;
+}
+
+#input-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+#code-input {
+    margin: 0;          /* Firefox fix */
+    border-radius: 0;   /* iOS fix */
+
+    background-color: transparent;
+
+    resize: none;
+    overflow-y: scroll;
+
+    color: white;
+}
+.highlight-sync {
+    font-family: monospace;
+    font-size: medium;
+}
+#highlights {
+    position: absolute;
+    margin: 3px -3px 3px 3px;
+    overflow: hidden;
+    pointer-events: none;
+
+    color: transparent;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+mark {
+    color: transparent;
+    background-color: red;
+    opacity: 0.5;
+}
+
+#function-selector {
+    align-self: flex-start;
+}
+
+#argument-container {
+    align-self: stretch;
+    overflow-y: scroll;
+    flex-grow: 1;
+}
+#argument-title {
+    color: white;
+}
+.argument {
+    display: flex;
+    flex-flow: row;
+    gap: 5px;
+    margin: 5px 0px;
+}
+.argument-input {
+    flex-grow: 1;
+    margin-right: 5px;
+}
+
+#ctyoscape-container {
+    flex-grow: 1;
+
+    padding: 5px;
+    background-color: #444;
+    font-family: monospace;
+
+    color: white;
+}

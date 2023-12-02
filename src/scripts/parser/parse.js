@@ -10,6 +10,8 @@ function parse(tokens) {
 
     p.convertToThunks();
 
+    return p;
+
 }
 
 class ParserError extends Error {

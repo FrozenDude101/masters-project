@@ -71,16 +71,10 @@ class Program {
 
                 thunk.setPattern(...pThunk, iThunk);
             }
-            x = thunk;
         }
-
-        console.log(x.name);
-
-        x = x.bind(new LiteralThunk(5)).bind(new LiteralThunk(5));
 
     }
 
 }
 
-let x;
 let p = new Program();
