@@ -37,6 +37,7 @@ function addArgument() {
 }
 function removeArgument() {
     updateArgumentCount(argumentCount-1);
+
     ARGUMENT_CONTAINER.removeChild(ARGUMENT_CONTAINER.children[argumentCount]);
     if (!argumentCount) REMOVE_ARGUMENT.disabled = true;
 }
@@ -44,16 +45,13 @@ function removeArgument() {
 function updateArgumentCount(n) {
     argumentCount = n;
     ARGUMENT_COUNT.innerHTML = argumentCount;
+
     updateArgumentCountColour();
 }
 function updateRequiredArgumentCount(n) {
     requiredArgumentCount = n;
-    if (n === -1) {
-        REQUIRED_ARGUMENT_COUNT.innerHTML = "";
-        updateArgumentCountColour();
-        return;
-    }
-    REQUIRED_ARGUMENT_COUNT.innerHTML = "/" + n;
+    REQUIRED_ARGUMENT_COUNT.innerHTML = n === -1 ? "" : "/" + n;
+
     updateArgumentCountColour();
 }
 function updateArgumentCountColour() {
