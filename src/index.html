@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="style.css">
 
         <script src="scripts/ui/arguments.js" defer></script>
+        <script src="scripts/ui/execution.js" defer></script>
         <script src="scripts/ui/highlighting.js" defer></script>
         <script src="scripts/ui/ui.js" defer></script>
 
@@ -55,31 +56,30 @@ multiply :: Integer -> Integer -> Integer
 multiply 0 b = 0
 multiply a b = add b (multiply (pred a) b)</textarea>
             </div>
-            <div id="error-container">
-                <span class="literal-span"> </span>
-            </div>
-            <select id="function-selector">
-                <option>Wait for first parse.</option>
-            </select>
-            <div>
-                <span class="title literal-span">Return Type: </span>
-                <input id="return-type" disabled>
-            </div>
-            <div>
-                <span class="title">Return Value:</span>
-                <input id="return-value" disabled>
-            </div>
-            <div>
-                <span class="title" id="argument-title">
-                    Arguments (<span id="argument-count">0</span><span id="required-argument-count"></span>):
-                </span>
-                <button id="add-argument" onclick="addArgument()">+</button>
-                <button id="remove-argument" onclick="removeArgument()" disabled>-</button>
-            </div>
-            <div id="argument-container">
+            <div id="scrollable-container">
+                <div id="error-container"></div>
+                <select id="function-selector">
+                    <option>Select a function.</option>
+                </select>
+                <div>
+                    <span class="title literal-span">Return Type: </span>
+                    <input id="return-type">
+                </div>
+                <div>
+                    <span class="title">Return Value:</span>
+                    <input id="return-value">
+                </div>
+                <div>
+                    <span class="title" id="argument-title">
+                        Arguments (<span id="argument-count">0</span><span id="required-argument-count"></span>):
+                    </span>
+                    <button id="add-argument" onclick="addArgument()">+</button>
+                    <button id="remove-argument" onclick="removeArgument()" disabled>-</button>
+                </div>
+                <div id="argument-container"></div>
             </div>
             <div id="controls">
-                <button onclick="run()">Run</button>
+                <button onclick="execute()">Execute</button>
                 <button onclick="start()">Start</button>
                 <button onclick="step()">Step</button>
                 <button onclick="stop()">Stop</button>

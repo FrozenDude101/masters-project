@@ -62,14 +62,29 @@ mark {
     opacity: 0.5;
 }
 
+#scrollable-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-self: stretch;
+    overflow: hidden auto;
+    flex-grow: 1;
+    gap: 5px;
+}
+
+#error-container {
+    align-self: stretch;
+}
+.error-message {
+    color: white;
+}
+
 #function-selector {
     align-self: flex-start;
 }
 
 #argument-container {
     align-self: stretch;
-    overflow-y: scroll;
-    flex-grow: 1;
 }
 #argument-title {
     color: white;

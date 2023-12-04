@@ -2,6 +2,9 @@ const CODE_INPUT  = document.getElementById("code-input");
 const BACKDROP    = document.getElementById("backdrop");
 const HIGHLIGHTS  = document.getElementById("highlights");
 
+HIGHLIGHTS.style.width = CODE_INPUT.clientWidth + "px";
+HIGHLIGHTS.style.height = (CODE_INPUT.clientHeight-1) + "px";
+
 CODE_INPUT.addEventListener("scroll", () => {
     let scrollTop = CODE_INPUT.scrollTop;
     HIGHLIGHTS.scrollTop = scrollTop;
@@ -20,16 +23,5 @@ CODE_INPUT.addEventListener("input", () => {
 });
 
 function applyHighlights(text) {
-    let newText = "";
-    for (let i = 0; i < text.length; i++) {
-        if (i % 2) {
-            newText += text[i];
-            continue;
-        }
-        newText += `<mark>${text[i]}</mark>`;
-    }
-    return newText;
+    return text;
 }
-
-HIGHLIGHTS.style.width = CODE_INPUT.clientWidth + "px";
-HIGHLIGHTS.style.height = (CODE_INPUT.clientHeight-1) + "px";

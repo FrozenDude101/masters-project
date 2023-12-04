@@ -1,4 +1,4 @@
-{
+
 let codeInput          = document.getElementById("code-input");
 let cytoscapeContainer = document.getElementById("ctyoscape-container");
 
@@ -9,7 +9,7 @@ codeInput.addEventListener("input", () => {
     clearTimeout(parseTimeout);
     parseTimeout = setTimeout(() => {
         console.log("Lexing");
-        let input = LexerInput.fromInput(codeInput.value + "\n");
+        let input = LexerInput.fromInput(CODE_INPUT.value + "\n");
         let tokens = Lexer.lexer(t_program)(input)[0].tokens;
         tokens = tokens.filter((t) => t.type !== Token.WHITESPACE || t.value.includes("\n"));
         tokens = tokens.map((t) => t.value.includes("\n") ? new Token(Token.SPECIAL, "\n", t.index) : t);
@@ -48,7 +48,7 @@ codeInput.addEventListener("input", () => {
             functionSelector.innerHTML += `<option>${f}</option>`
         }
 
-    }, 5000);
+    }, 1);
 });
 
 codeInput.dispatchEvent(new InputEvent("input"));
@@ -102,22 +102,4 @@ function run() {
         
     }
 
-}
-
-function step() {
-
-    let box = document.getElementById("parsed");
-
-
-    try {
-        x = x.step();
-        box.innerHTML = "";
-    } catch (e) {
-        console.log(e)
-        return;
-    }
-
-    box.innerHTML = ""+x;
-
-}
 }
