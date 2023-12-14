@@ -45,10 +45,9 @@ class LiteralArgument {
         return t.canStep();
     }
     matches(t,_) {
-        let v = t.getValue();
-        if (v.thunkType !== EThunk.LITERAL)
+        if (t.thunkType !== EThunk.LITERAL)
             return false;
-        if (v.value !== this.value)
+        if (t.value !== this.value)
             return false;
         return true;
     }
