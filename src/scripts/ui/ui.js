@@ -20,7 +20,7 @@ FUNCTION_SELECTOR.addEventListener("change", () => {
 
     let fT = Program.get(FUNCTION_SELECTOR.value);
     let p = fT.patterns[0];
-    updateRequiredArgumentCount(p.length);
+    updateRequiredArgumentCount(p.length());
 });
 
 function addError(e) {
