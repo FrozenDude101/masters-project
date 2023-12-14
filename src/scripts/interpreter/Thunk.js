@@ -120,7 +120,7 @@ class FunctionThunk {
     }
 
     replaceUnboundThunks(rs) {
-        let args = [this.name];
+        let nextFunction = new FunctionThunk(`${this.name}`);
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
             let impl = this.implementations[i];
@@ -136,9 +136,9 @@ class FunctionThunk {
                 }
             }
 
-            args.push(patt, impl);
+            nextFunction.setCase(patt, impl);
         }
-        return new FunctionThunk(...args);
+        return nextFunction;
     }
 
 }

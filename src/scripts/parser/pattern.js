@@ -7,7 +7,7 @@ class PatternNode {
 
         this.type = type;
         this.value = value;
-        this.children = this.children;
+        this.children = children;
 
     }
 

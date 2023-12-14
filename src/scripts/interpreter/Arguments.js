@@ -45,8 +45,10 @@ class LiteralArgument {
         return t.canStep();
     }
     matches(t,_) {
+        console.log(t.thunkType, EThunk.LITERAL);
         if (t.thunkType !== EThunk.LITERAL)
             return false;
+        console.log(t.value, this.value);
         if (t.value !== this.value)
             return false;
         return true;

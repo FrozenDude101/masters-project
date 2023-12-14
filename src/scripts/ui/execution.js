@@ -59,11 +59,7 @@ function step() {
         displayState();
         return;
     }
-    try {
-        state = state.step();
-    } catch (e) {
-        return e;
-    }
+    state = state.step();
     displayState();
     return null;
 }
