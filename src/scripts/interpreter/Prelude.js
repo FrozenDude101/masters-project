@@ -1,27 +1,21 @@
-/*  The below JS corresponds directly to this Haskell.
+let symbol_plus = new JSThunk("(+)", (a) => (b) => a+b);
 
-    minus_one = -1
-    zero      =  0
-    one       =  1
-    two       =  2
-    ten       = 10
+let add = new FunctionThunk("add");
+add.setCase(
+    new Pattern(new VariableArgument("a"), new VariableArgument("b")),
+    new ApplicationThunk(
+        new ApplicationThunk(
+            symbol_plus,
+            new UnboundThunk("a"),
+        ),
+        new UnboundThunk("b"),
+    ),
+);
 
-    (+) = primitive operation
-
-    add a b = (+) a b
-
-    succ = add 1
-    pred = add (-1)
-
-    decrementToZero 0 = 0
-    decrementToZero a = decrementToZero (pred a)
-
-    multiply 0 a = 0
-    multiply a b = (+) b (multiply (pred a) b)
-*/
-
-let symbol_plus  = new JSThunk("(+)", (a) => (b) => a + b);
-Program.register("(+)", symbol_plus);
-
-let pred = new JSThunk("pred", (a) => a-1);
-Program.register("pred", pred);
+let t1 = new ApplicationThunk(
+    new ApplicationThunk(
+        add,
+        new LiteralThunk(1),
+    ),
+    new LiteralThunk(2),
+)

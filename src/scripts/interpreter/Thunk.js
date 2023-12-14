@@ -1,272 +1,210 @@
 class EThunk {
 
-    static APPLICATION        = "Application";
-    static FUNCTION           = "Function";
-    static ARGUMENT           = "Argument";
-    static LITERAL_ARGUMENT   = "LiteralArgument";
-    static UNBOUND            = "Unbound";
-    static LITERAL            = "Literal";
-    static JAVASCRIPT         = "JavaScript";
+    static APPLICATION = "application";
+    static LITERAL     = "literal";
+    static FUNCTION    = "function";
+    static UNBOUND     = "unbound";
+    static JAVASCRIPT  = "javascript";
 
 }
 
-class Thunk {
+class ApplicationThunk {
 
-    replaceUnboundThunks(fT, args) {
-        return this;
-    }
-    rebindUnboundThunks(before, after) {
-        return this;
-    }
-
-}
-
-class ApplicationThunk extends Thunk {
-
-    type = EThunk.APPLICATION;
+    thunkType = EThunk.APPLICATION;
 
     constructor(t1, t2) {
-        super();
         this.t1 = t1;
         this.t2 = t2;
     }
     clone() {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
     }
-
-    step() {
-        switch (this.t1.type) {
-            case EThunk.APPLICATION:
-                return new ApplicationThunk(this.t1.step(), this.t2);
-            case EThunk.FUNCTION:
-                return this.t1.bind(this.t2);
-            case EThunk.ARGUMENT:
-            case EThunk.LITERAL_ARGUMENT:
-                throw new ThunkError("Argument thunk cannot be applied to.");
-            case EThunk.UNBOUND:
-                throw new ThunkError("Unbound thunk cannot be applied to.");
-            case EThunk.LITERAL:
-                throw new ThunkError("Literal thunk cannot be applied to.");
-            case EThunk.JAVASCRIPT:
-                let vals = this.t1.bind(this.t2);
-                if (vals[0])
-                    return vals[1];
-                this.t2 = vals[1];
-                return this;
-        }
-    }
-
-    replaceUnboundThunks(fT, args) {
-        this.t1 = this.t1.replaceUnboundThunks(fT, args);
-        this.t2 = this.t2.replaceUnboundThunks(fT, args);
-        return this;
-    }
-    rebindUnboundThunks(before, after) {
-        this.t1 = this.t1.rebindUnboundThunks(before, after);
-        this.t2 = this.t2.rebindUnboundThunks(before, after);
-        return this;
-    }
-
     toString() {
         return `{${this.t1} ${this.t2}}`;
     }
 
+    canStep() {
+        return true;
+    }
+    step() {
+        switch (this.t1.thunkType) {
+            case EThunk.APPLICATION:
+                return new ApplicationThunk(this.t1.step(), this.t2);
+            case EThunk.FUNCTION:
+            case EThunk.JAVASCRIPT:
+                return this.t1.bind(this.t2);
+            default:
+                throw `Can't bind ${this.t2} to ${this.t1}.`;
+        }
+    }
+
+    replaceUnboundThunks(rs) {
+        return new ApplicationThunk(this.t1.replaceUnboundThunks(rs), this.t2.replaceUnboundThunks(rs));
+    }
+
 }
 
-class FunctionThunk extends Thunk {
+class LiteralThunk {
 
-    type = EThunk.FUNCTION;
+    thunkType = EThunk.LITERAL;
+
+    constructor(value) {
+        this.value = value;
+    }
+    clone() {
+        return this;
+    }
+    toString() {
+        return `${this.value}`;
+    }
+
+    canStep() {
+        return false;
+    }
+
+    replaceUnboundThunks(rs) {
+        return this;
+    }
+
+}
+
+class FunctionThunk {
+
+    thunkType = EThunk.FUNCTION;
 
     constructor(name) {
-        super();
+
         this.name = name;
-        this.patterns = [];
-        this.impls = [];
+        this.patterns        = []
+        this.implementations = []
     }
     clone() {
-        return this;
+        return new FunctionThunk(this.name, this.patterns.map((p,i) => [p, this.implementations[i].clone()]).flat())
     }
-
-    setPattern(...pattern) {
-        let impl = pattern.pop();
-        this.patterns.push(pattern);
-        this.impls.push(impl);
-    }
-
-    bind(t2) {
-        let c = new FunctionThunk(`${this.name}$${t2}`);
-        for (let i = 0; i < this.patterns.length; i++) {
-            let pattern = this.patterns[i];
-            let replacements = patternMatch(pattern, t2);
-            if (replacements) {
-                let impl = this.impls[i]
-                    .clone()
-                    .replaceUnboundThunks(this, replacements)
-                    .rebindUnboundThunks(this, c);
-                if (pattern.length === 1)
-                    return impl;
-                c.setPattern(...pattern.slice(1), impl);
-            }
-        }
-        return c;
-    }
-
-    rename(name) {
-        this.name = name;
-        return this;
-    }
-
     toString() {
-        return this.name;
+        return `${this.name}`;
+    }
+
+    setCase(pattern, impl) {
+        let patternLength = Math.max(...this.patterns.map(p => p.length()));
+        if (patternLength !== -Infinity && pattern.length() !== patternLength)
+            throw "All patterns must have any equal number of arguments.";
+
+        this.patterns.push(pattern);
+        this.implementations.push(impl);
+    }
+
+    bind(t1) {
+        let nextFunction = new FunctionThunk(`${this.name}$${t1}`);
+        for (let i = 0; i < this.patterns.length; i++) {
+            let patt = this.patterns[i];
+
+            if (patt.requiresSteps(t1))
+                return new ApplicationThunk(this, t1.step());
+
+            let rs = patt.matches(t1);
+            if (!rs)
+                continue;
+            let impl = this.implementations[i].replaceUnboundThunks(rs);
+
+            patt = patt.next();
+            if (patt.finishedMatching()) {
+                return impl;
+            }
+            nextFunction.setCase(patt, impl);
+        }
+        return nextFunction;
+    }
+    canStep() {
+        return false;
+    }
+
+    replaceUnboundThunks(rs) {
+        let args = [this.name];
+        for (let i = 0; i < this.patterns.length; i++) {
+            let patt = this.patterns[i];
+            let impl = this.implementations[i];
+
+            let overwritten = patt.getSymbols();
+            let keys = Object.keys(rs).filter(k => !overwritten.includes(k));
+
+            console.log(""+patt);
+
+            if (keys.length !== 0) {
+                for (let key of keys) {
+                    let rsClone = {};
+                    rsClone[key] = rs[key];
+                    impl = impl.replaceUnboundThunks(rsClone);
+                }
+            }
+
+            args.push(patt, impl);
+        }
+        return new FunctionThunk(...args);
     }
 
 }
 
-class ArgumentThunk extends Thunk {
+class UnboundThunk {
 
-    type = EThunk.ARGUMENT;
+    thunkType = EThunk.UNBOUND;
 
     constructor(symbol) {
-        super();
         this.symbol = symbol;
-    }
-
-}
-
-class LiteralArgumentThunk extends Thunk {
-
-    type = EThunk.LITERAL_ARGUMENT;
-
-    constructor(value) {
-        super();
-        this.value = value;
-    }
-
-    toString() {
-        return this.value;
-    }
-
-}
-
-class UnboundThunk extends Thunk {
-
-    type = EThunk.UNBOUND;
-
-    constructor(fT, symbol) {
-        super();
-        this.boundTo = fT;
-        this.symbol = symbol;
-    }
-    clone() {
-        return new UnboundThunk(this.boundTo, this.symbol);
-    }
-    
-    isBoundTo(fT) {
-        return this.boundTo === fT;
-    }
-    rebind(fT) {
-        this.boundTo = fT;
-    }
-
-    replaceUnboundThunks(fT, args) {
-        if (!this.isBoundTo(fT))
-            return this;
-
-        if (!Object.keys(args).includes(this.symbol))
-            return this;
-
-        return args[this.symbol];
-    }
-    rebindUnboundThunks(before, after) {
-        if (this.boundTo === before)
-            this.boundTo = after;
-        return this;
-    }
-
-    toString() {
-        return this.symbol;
-    }
-
-}
-
-class LiteralThunk extends Thunk {
-
-    type = EThunk.LITERAL;
-
-    constructor(value) {
-        super();
-        this.value = value;
     }
     clone() {
         return this;
     }
-
-    step() {
-        return this.value;
+    toString() {
+        return `${this.symbol}`;
     }
 
-    toString() {
-        return this.value;
+    canStep() {
+        return false;
+    }
+
+    replaceUnboundThunks(rs) {
+        if (this.symbol in rs)
+            return rs[this.symbol];
+        return this;
     }
 
 }
 
-class JSThunk extends Thunk {
+class JSThunk {
 
-    type = EThunk.JAVASCRIPT;
+    thunkType = EThunk.JAVASCRIPT;
 
-    constructor(name, f) {
-        super();
+    constructor(name, func) {
         this.name = name;
-        this.f = f;
+        this.func = func;
     }
     clone() {
         return this;
     }
-
-    bind(t2) {
-        t2 = t2.step();
-        if (t2 instanceof Thunk) 
-            return [false, t2];
-
-        let fv = this.f(t2);
-
-        if (fv instanceof Function)
-            return [true, new JSThunk(`${this.name}$${t2}`, fv)];
-
-        return [true, new LiteralThunk(fv)];
-    }
-
     toString() {
         return this.name;
     }
 
-}
+    bind(t1) {
+        if (t1.canStep())
+            return new ApplicationThunk(this, t1.step());
 
-class ThunkError extends Error {}
+        let value = t1.value;
+        let result = this.func(value);
+        
+        console.log(result);
+        if (result instanceof Function)
+            return new JSThunk(`${this.name}$${value}`, result);
 
-
-function patternMatch(pattern, arg) {
-    let replacements = {};
-
-    let p = pattern[0];
-    switch (p.type) {
-        case EThunk.ARGUMENT:
-            replacements[p.symbol] = arg;
-            break;
-        case EThunk.LITERAL_ARGUMENT:
-            while (arg instanceof Thunk) {
-                arg = arg.step();
-            }
-            arg = new LiteralThunk(arg);
-            if (arg.type !== EThunk.LITERAL)
-                return false;
-            if (p.value !== arg.value)
-                return false;
-            break;
-        default:
-            return false;
+        return new LiteralThunk(result);
+    }
+    canStep() {
+        return false;
     }
 
-    return replacements;
+    replaceUnboundThunks(rs) {
+        return this;
+    }
+
 }

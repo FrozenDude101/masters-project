@@ -31,7 +31,7 @@ class ImplNode {
 
     }
 
-    toThunk(fT) {
+    toThunk() {
 
         switch (this.type) {
             case ImplNode.LITERAL:
@@ -39,23 +39,22 @@ class ImplNode {
             case ImplNode.VARID:
                 if (Program.contains(this.value))
                     return Program.get(this.value);
-                return new UnboundThunk(fT, this.value);
+                return new UnboundThunk(this.value);
             case ImplNode.APP:
                 return new ApplicationThunk(
-                    this.children[0].toThunk(fT),
-                    this.children[1].toThunk(fT),
+                    this.children[0].toThunk(),
+                    this.children[1].toThunk(),
                 );
             case ImplNode.INFIX:
                 return new ApplicationThunk(
                     new ApplicationThunk(
                         Program.get("(" + this.value + ")"),
-                        this.children[0].toThunk(fT),
+                        this.children[0].toThunk(),
                     ),
-                    this.children[1].toThunk(fT),
+                    this.children[1].toThunk(),
                 );
             default:
                 throw "Womp Womp";
-
         }
 
     }

@@ -57,22 +57,20 @@ class Program {
     }
 
     convertToThunks() {
-
         for (let f in this.functions) {
             let thunk = new FunctionThunk(f);
             Program.register(f, thunk);
             let data = this.functions[f];
             for (let i = 0; i < data.patterns.length; i++) {
-                let pat = data.patterns[i];
-                let pThunk = pat.map(p => p.toThunk());
+                let patt = data.patterns[i];
+                patt = new Pattern(...patt.map(p => p.toArgument()));
 
                 let impl = data.implementations[i];
-                let iThunk = impl.toThunk(thunk);
+                impl = impl.toThunk();
 
-                thunk.setPattern(...pThunk, iThunk);
+                thunk.setCase(patt, impl);
             }
         }
-
     }
 
 }

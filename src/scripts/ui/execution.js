@@ -38,7 +38,7 @@ let executeInterval = null;
 function execute() {
     setupState();
     executeInterval = setInterval(() => {
-        if (state instanceof Thunk) {
+        if (state.canStep()) {
             let e = step();
             if (e) {
                 clearInterval(executeInterval);

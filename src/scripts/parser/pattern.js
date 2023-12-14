@@ -21,15 +21,13 @@ class PatternNode {
 
     }
 
-    toThunk() {
-
+    toArgument() {
         switch (this.type) {
             case PatternNode.LITERAL:
-                return new LiteralArgumentThunk(parseInt(this.value));
+                return new LiteralArgument(this.value);
             case PatternNode.VAR:
-                return new ArgumentThunk(this.value);
+                return new VariableArgument(this.value);
         }
-
     }
 
 }
