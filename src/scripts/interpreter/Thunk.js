@@ -128,8 +128,6 @@ class FunctionThunk {
             let overwritten = patt.getSymbols();
             let keys = Object.keys(rs).filter(k => !overwritten.includes(k));
 
-            console.log(""+patt);
-
             if (keys.length !== 0) {
                 for (let key of keys) {
                     let rsClone = {};
