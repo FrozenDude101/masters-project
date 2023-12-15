@@ -17,4 +17,4 @@ t_program.set(max(many(
 t_lexeme.set(max(any(
     t_qvarid, t_qconid, t_qvarsym, t_qconsym, t_literal, t_special, t_reservedop, t_reservedid
 ), index));
-t_literal.set(tok(any(t_integer, t_float, t_char, t_string), Token.LITERAL));
+t_literal.set(any(t_integer, t_float, t_char, t_string));

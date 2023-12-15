@@ -14,22 +14,22 @@ let [t_decimal, t_octal, t_hexadecimal, t_integer, t_float, t_exponent,] = Funct
       "decimal", "octal", "hexadecimal", "integer", "float", "exponent",
 );
 
-t_decimal.set(all(t_digit, many(t_digit)));
-t_octal.set(all(t_octit, many(t_octit)));
-t_hexadecimal.set(all(t_hexit, many(t_hexit)));
+t_decimal.set(tok(all(t_digit, many(t_digit)), Token.INT_LITERAL));
+t_octal.set(tok(all(t_octit, many(t_octit)), Token.OCT_LITERAL));
+t_hexadecimal.set(tok(all(t_hexit, many(t_hexit)), Token.HEX_LITERAL));
 
-t_integer.set(tok(any(
+t_integer.set(any(
     t_decimal,
     all("0", "o", t_octal),
     all("0", "O", t_octal),
     all("0", "x", t_hexadecimal),
     all("0", "X", t_hexadecimal),
-), Token.LITERAL));
+));
 
 t_float.set(tok(any(
     all(t_decimal, ".", t_decimal, opt(t_exponent)),
     all(t_decimal, t_exponent)
-), Token.LITERAL));
+), Token.FLOAT_LITERAL));
 
 t_exponent.set(all(
     any("e", "E"),
@@ -54,26 +54,26 @@ let [t_char, t_string, t_escape, t_charesc, t_ascii, t_cntrl, t_gap,] = Function
       "char", "string", "escape", "charesc", "ascii", "cntrl", "gap",
 );
 
-t_char.set(tok(all(
+t_char.set(all(
     "'",
-    any(
+    tok(any(
         diff(t_graphic, any("'", "/")),
         " ",
         diff(t_escape, all("/", "&")),
-    ),
+    ), Token.CHAR_LITERAL),
     "'",
-), Token.LITERAL));
+));
 
-t_string.set(tok(all(
+t_string.set(all(
     "\"",
-    many(any(
+    tok(many(any(
         diff(t_graphic, any("\"", "\\")),
         t_space,
         t_escape,
         t_gap,
-    )),
+    )), Token.STRING_LITERAL),
     "\"",
-), Token.LITERAL));
+));
 
 t_escape.set(all("\\", any(
     t_charesc, t_ascii, t_decimal,

@@ -17,16 +17,8 @@ codeInput.addEventListener("input", () => {
         cytoscapeContainer.innerHTML = "";
 
         console.log("Parsing");
-        let program;
-        try {
-            program = parse(tokens);
-        } catch (e) {
-            cytoscapeContainer.innerHTML = `
-                ${e}<br>
-                At: ${e.index === null ? "End of Input" : e.index}.
-            `;
-            return;
-        }
+        console.table(tokens);
+        let program = parse(tokens);
 
         for (let f in program.functions) {
             let type = program.functions[f].type;

@@ -52,8 +52,9 @@ class LiteralThunk {
 
     thunkType = EThunk.LITERAL;
 
-    constructor(value) {
+    constructor(value, type) {
         this.value = value;
+        this.type = type;
     }
     clone() {
         return this;
@@ -63,16 +64,7 @@ class LiteralThunk {
     }
 
     getType() {
-        switch (typeof this.value) {
-            case "boolean":
-                return new VariableType("Bool");
-            case "number":
-                return new VariableType("Integer");
-            case "string":
-                return new VariableType("String");
-            default:
-                throw `Unknown value type for ${this.value}`;
-        }
+        return this.type;
     }
 
     canStep() {

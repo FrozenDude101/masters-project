@@ -4,7 +4,11 @@ class ImplNode {
     static CONID   = "conid";
     static APP     = "app";
     static INFIX   = "infix";
-    static LITERAL = "literal";
+
+    static INTEGER = "integer";
+    static FLOAT   = "float";
+    static CHAR    = "character";
+    static STRING  = "string";
 
     constructor(type, value, children) {
 
@@ -17,7 +21,10 @@ class ImplNode {
     toString() {
 
         switch (this.type) {
-            case ImplNode.LITERAL:
+            case ImplNode.INTEGER:
+            case ImplNode.FLOAT:
+            case ImplNode.CHAR:
+            case ImplNode.STRING:
             case ImplNode.VARID:
             case ImplNode.CONID:
                 return this.value;
@@ -27,15 +34,19 @@ class ImplNode {
                 return `(${this.children[0]} ${this.value} ${this.children[1]})`;
         }
 
-        console.log(this.type);
-
     }
 
     toThunk() {
 
         switch (this.type) {
-            case ImplNode.LITERAL:
-                return new LiteralThunk(parseInt(this.value));
+            case ImplNode.INTEGER:
+                return new LiteralThunk(this.value, new VariableType("Integer"));
+            case ImplNode.FLOAT:
+                return new LiteralThunk(this.value, new VariableType("Float"));
+            case ImplNode.CHAR:
+                return new LiteralThunk(this.value, new VariableType("Char"));
+            case ImplNode.STRING:
+                return new LiteralThunk(this.value, new VariableType("String"));
             case ImplNode.VARID:
                 if (Program.contains(this.value))
                     return Program.get(this.value);
@@ -69,8 +80,28 @@ function parseImplementation(tokens, endChar = "\n") {
 
         let node;
         switch (t.type) {
-            case Token.LITERAL:
-                node = new ImplNode(ImplNode.LITERAL, t.value, []);
+            case Token.INT_LITERAL:
+                node = new ImplNode(ImplNode.INTEGER, parseInt(t.value), []);
+                impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
+                break;
+            case Token.FLOAT_LITERAL:
+                node = new ImplNode(ImplNode.FLOAT, parseFloat(t.value), []);
+                impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
+                break;
+            case Token.HEX_LITERAL:
+                node = new ImplNode(ImplNode.INTEGER, parseInt(t.value, 16), []);
+                impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
+                break;
+            case Token.OCT_LITERAL:
+                node = new ImplNode(ImplNode.INTEGER, parseInt(t.value, 8), []);
+                impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
+                break;
+            case Token.CHAR_LITERAL:
+                node = new ImplNode(ImplNode.CHAR, t.value, []);
+                impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
+                break;
+            case Token.STRING_LITERAL:
+                node = new ImplNode(ImplNode.STRING, t.value, []);
                 impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
                 break;
             case Token.CONID:
@@ -103,6 +134,9 @@ function parseImplementation(tokens, endChar = "\n") {
                     default:
                         throw new ParserError(`Unexpected ${t.value}.`, t.index, t.value.length);
                 }
+                break;
+            default:
+                throw "Unknown " + t.type + "\n" + t.value;
         }
     }
 

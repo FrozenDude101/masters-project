@@ -1,6 +1,10 @@
 class PatternNode {
 
-    static LITERAL = "literal";
+    static INTEGER = "integer";
+    static FLOAT   = "float";
+    static CHAR    = "character";
+    static STRING  = "string";
+
     static VAR = "var";
 
     constructor(type, value, children) {
@@ -14,8 +18,7 @@ class PatternNode {
     toString() {
 
         switch (this.type) {
-            case PatternNode.LITERAL:
-            case PatternNode.VAR:
+            default:
                 return this.value;
         }
 
@@ -23,8 +26,14 @@ class PatternNode {
 
     toArgument() {
         switch (this.type) {
-            case PatternNode.LITERAL:
-                return new LiteralArgument(this.value);
+            case PatternNode.INTEGER:
+                return new LiteralArgument(this.value, new VariableType("Integer"));
+            case PatternNode.FLOAT:
+                return new LiteralArgument(this.value, new VariableType("Float"));
+            case PatternNode.CHAR:
+                return new LiteralArgument(this.value, new VariableType("Char"));
+            case PatternNode.STRING:
+                return new LiteralArgument(this.value, new VariableType("String"));
             case PatternNode.VAR:
                 return new VariableArgument(this.value);
         }
@@ -44,8 +53,28 @@ function parsePattern(tokens) {
                 node = new PatternNode(PatternNode.VAR, t.value, []);
                 terms.push(node);
                 break;
-            case Token.LITERAL:
-                node = new PatternNode(PatternNode.LITERAL, t.value, []);
+            case Token.INT_LITERAL:
+                node = new PatternNode(PatternNode.INTEGER, parseInt(t.value), []);
+                terms.push(node);
+                break;
+            case Token.FLOAT_LITERAL:
+                node = new PatternNode(PatternNode.FLOAT, parseFloat(t.value), []);
+                terms.push(node);
+                break;
+            case Token.HEX_LITERAL:
+                node = new PatternNode(PatternNode.INTEGER, parseInt(t.value, 16), []);
+                terms.push(node);
+                break;
+            case Token.OCT_LITERAL:
+                node = new PatternNode(PatternNode.INTEGER, parseInt(t.value, 8), []);
+                terms.push(node);
+                break;
+            case Token.CHAR_LITERAL:
+                node = new PatternNode(PatternNode.CHAR, t.value, []);
+                terms.push(node);
+                break;
+            case Token.STRING_LITERAL:
+                node = new PatternNode(PatternNode.STRING, t.value, []);
                 terms.push(node);
                 break;
             case Token.OP:
