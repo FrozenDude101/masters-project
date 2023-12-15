@@ -225,7 +225,7 @@ class JSThunk {
 
         let value = t1.value;
         let result = this.func(value);
-        let type = this.type.bind(t1.type());
+        let type = this.type.bind(t1.getType());
         
         console.log(result);
         if (result instanceof Function)
