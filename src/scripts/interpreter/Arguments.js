@@ -16,6 +16,10 @@ class VariableArgument {
         return `${this.symbol}`;
     }
 
+    getType() {
+        return new UnboundType(this.symbol);
+    }
+
     requiresSteps(t) {
         return false;
     }
@@ -39,6 +43,19 @@ class LiteralArgument {
     }
     toString() {
         return `${this.value}`;
+    }
+
+    getType() {
+        switch (typeof this.value) {
+            case "boolean":
+                return new VariableType("Bool");
+            case "number":
+                return new VariableType("Integer");
+            case "string":
+                return new VariableType("String");
+            default:
+                throw `Unknown value type for ${this.value}`;
+        }
     }
 
     requiresSteps(t) {

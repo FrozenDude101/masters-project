@@ -23,6 +23,10 @@ class ApplicationThunk {
         return `{${this.t1} ${this.t2}}`;
     }
 
+    getType() {
+        return this.t1.getType().bind(this.t2.getType());
+    }
+
     canStep() {
         return true;
     }
@@ -58,6 +62,19 @@ class LiteralThunk {
         return `${this.value}`;
     }
 
+    getType() {
+        switch (typeof this.value) {
+            case "boolean":
+                return new VariableType("Bool");
+            case "number":
+                return new VariableType("Integer");
+            case "string":
+                return new VariableType("String");
+            default:
+                throw `Unknown value type for ${this.value}`;
+        }
+    }
+
     canStep() {
         return false;
     }
@@ -83,6 +100,15 @@ class FunctionThunk {
     }
     toString() {
         return `${this.name}`;
+    }
+
+    getType() {
+        let pTypes = this.patterns[0].args.map(a => a.getType());
+        let type  = this.implementations[0].getType();
+        do {
+            type = new FunctionType(pTypes.pop(), type);
+        } while (pTypes.length);
+        return type;
     }
 
     setCase(pattern, impl) {
@@ -157,6 +183,10 @@ class UnboundThunk {
         return `${this.symbol}`;
     }
 
+    getType() {
+        return new UnboundType(this.symbol);
+    }
+
     canStep() {
         return false;
     }
@@ -173,9 +203,10 @@ class JSThunk {
 
     thunkType = EThunk.JAVASCRIPT;
 
-    constructor(name, func) {
+    constructor(name, func, type) {
         this.name = name;
         this.func = func;
+        this.type = type;
     }
     clone() {
         return this;
@@ -184,16 +215,21 @@ class JSThunk {
         return this.name;
     }
 
+    getType() {
+        return this.type;
+    }
+
     bind(t1) {
         if (t1.canStep())
             return new ApplicationThunk(this, t1.step());
 
         let value = t1.value;
         let result = this.func(value);
+        let type = this.type.bind(t1.type());
         
         console.log(result);
         if (result instanceof Function)
-            return new JSThunk(`${this.name}$${value}`, result);
+            return new JSThunk(`${this.name}$${value}`, result, type);
 
         return new LiteralThunk(result);
     }
