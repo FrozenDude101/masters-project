@@ -48,11 +48,11 @@ class LiteralArgument {
     getType() {
         switch (typeof this.value) {
             case "boolean":
-                return new VariableType("Bool");
+                return new LiteralType("Bool");
             case "number":
-                return new VariableType("Integer");
+                return new LiteralType("Integer");
             case "string":
-                return new VariableType("String");
+                return new LiteralType("String");
             default:
                 throw `Unknown value type for ${this.value}`;
         }
