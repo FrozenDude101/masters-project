@@ -40,13 +40,13 @@ class ImplNode {
 
         switch (this.type) {
             case ImplNode.INTEGER:
-                return new LiteralThunk(this.value, new VariableType("Integer"));
+                return new LiteralThunk(this.value, new LiteralType("Integer"));
             case ImplNode.FLOAT:
-                return new LiteralThunk(this.value, new VariableType("Float"));
+                return new LiteralThunk(this.value, new LiteralType("Float"));
             case ImplNode.CHAR:
-                return new LiteralThunk(this.value, new VariableType("Char"));
+                return new LiteralThunk(this.value, new LiteralType("Char"));
             case ImplNode.STRING:
-                return new LiteralThunk(this.value, new VariableType("String"));
+                return new LiteralThunk(this.value, new LiteralType("String"));
             case ImplNode.VARID:
                 if (Program.contains(this.value))
                     return Program.get(this.value);

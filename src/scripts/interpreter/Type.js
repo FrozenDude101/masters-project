@@ -1,15 +1,55 @@
 class Type {
-
     static APPLICATION = "application";
-    static VARIABLE    = "variable";
-    static UNBOUND     = "unbound";
+    static LITERAL     = "literal";
     static FUNCTION    = "function";
+    static UNBOUND     = "unbound";
 
+    unifyConstraints(cs) {
+        let closed = {};
+        while (cs.length) {
+            let [s,t] = cs.pop();
+
+            if (!(s in closed)) {
+                closed[s] = t;
+                cs = cs.map((c) => [c[0], c[1].substituteConstraint(s, t)]);
+                for (let key in closed) {
+                    closed[key] = closed[key].substituteConstraint(s, t);
+                }
+                continue;
+            }
+
+            if (closed[s].equals(t))
+                continue;
+            if (!closed[s].canMatch(t))
+                throw `Type Unification Error:\nCan't match\n${closed[s]}\n${t}`;
+
+            if (closed[s].typeType === Type.UNBOUND) {
+                let s2 = closed[s].symbol;
+                cs = cs.map((c) => [c[0], c[1].substituteConstraint(s2, t)]);
+                for (let key in closed) {
+                    closed[key] = closed[key].substituteConstraint(s2, t);
+                }
+                continue;
+            } 
+
+            if (t.typeType === Type.UNBOUND) {
+                cs = cs.map((c) => [c[0], c[1].substituteConstraint(s, closed[s])]);
+                for (let key in closed) {
+                    closed[key] = closed[key].substituteConstraint(s, closed[s]);
+                }
+                continue;
+            }
+
+            throw "I haven't accounted for this case yet.";
+        }
+
+        return closed;
+    }
 }
 
 class ApplicationType extends Type {
 
-    type = Type.APPLICATION;
+    typeType = Type.APPLICATION;
 
     constructor(t1, t2) {
         super();
@@ -19,86 +59,97 @@ class ApplicationType extends Type {
     clone() {
         return new ApplicationType(this.t1.clone(), this.t2.clone());
     }
-
-    getSymbols() {
-        return [...new Set([...this.t1.getSymbols(), ...this.t2.getSymbols()])];
-    }
-    alphaConvert(rs) {
-        return new ApplicationType(this.t1.alphaConvert(rs), this.t2.alphaConvert(rs));
-    }
-    betaReduce(rs) {
-        return new ApplicationType(this.t1.betaReduce(rs), this.t2.betaReduce(rs));
-    }
-
-    equals(t3) {
-        return this.type === t3.type && this.t1.equals(t3.t1) && this.t2.equals(t3.t2);
-    }
-    matches(t3) {
-        switch (t3.type) {
-            case Type.APPLICATION:
-                return [this.t1.matches(t3.t1), this.t2.matches(t3.t2)].flat();
-            case Type.FUNCTION:
-                return [false];
-            case Type.UNBOUND:
-                return t3.matches(this);
-            case Type.VARIABLE:
-                return [false];
-        }
-    }
-
     toString() {
         return `{${this.t1} ${this.t2}}`;
     }
 
+    equals(t3) {
+        return this.typeType === t3.typeType && this.t1.equals(t3.t1) && this.t2.equals(t3.t2);
+    }
+
+    getSymbols() {
+        return this.t1.getSymbols().concat(this.t2.getSymbols());
+    }
+    alphaConvert(rs) {
+        return new ApplicationType(this.t1.alphaConvert(rs), this.t2.alphaConvert(rs));
+    }
+
+    canMatch(t3) {
+        switch (t3.typeType) {
+            case Type.APPLICATION:
+                return this.t1.canMatch(t3.t1) && this.t2.canMatch(t3.t2);
+            case Type.LITERAL:
+                return false;
+            case Type.FUNCTION:
+                return false;
+            case Type.UNBOUND:
+                return true;
+        }
+    }
+    getConstraints(t3) {
+        if (t3.typeType === Type.UNBOUND) {
+            return t3.getConstraints(this);
+        }
+        return this.t1.getConstraints(t3.t1).concat(this.t2.getConstraints(t3.t2));
+    }
+    substituteConstraint(s, t) {
+        return new ApplicationType(this.t1.substituteConstraint(s, t), this.t2.substituteConstraint(s, t));
+    }
+
 }
 
-class VariableType extends Type {
+class LiteralType extends Type {
 
-    type = Type.VARIABLE;
+    typeType = Type.LITERAL;
 
     constructor(value) {
         super();
         this.value = value;
     }
     clone() {
-        return new VariableType(this.value);
+        return new LiteralType(this.value);
+    }
+    toString() {
+        return `${this.value}`;
+    }
+
+    equals(t2) {
+        return this.typeType === t2.typeType && this.value === t2.value;
     }
 
     getSymbols() {
-        return []
+        return [];
     }
     alphaConvert(rs) {
-        return new VariableType(this.value);
-    }
-    betaReduce(rs) {
-        return new VariableType(this.value);
+        return this.clone();
     }
 
-    equals(t3) {
-        return this.type === t3.type && this.value === t3.value;
-    }
-    matches(t3) {
-        switch (t3.type) {
+    canMatch(t2) {
+        switch (t2.typeType) {
             case Type.APPLICATION:
-                return [false];
+                return false;
+            case Type.LITERAL:
+                return this.value === t2.value;
             case Type.FUNCTION:
-                return [false];
+                return false;
             case Type.UNBOUND:
-                return t3.matches(this);
-            case Type.VARIABLE:
-                return [this.value === t3.value];
+                return true;
         }
     }
-
-    toString() {
-        return this.value;
+    getConstraints(t2) {
+        if (t2.typeType === Type.UNBOUND) {
+            return t2.getConstraints(this);
+        }
+        return [];
     }
-
+    substituteConstraint(s, t) {
+        return this.clone();
+    }
 }
 
 class UnboundType extends Type {
 
-    type = Type.UNBOUND;
+    typeType = Type.UNBOUND;
 
     constructor(symbol) {
         super();
@@ -107,38 +158,42 @@ class UnboundType extends Type {
     clone() {
         return new UnboundType(this.symbol);
     }
+    toString() {
+        return `${this.symbol}`;
+    }
+
+    equals(t2) {
+        return this.typeType === t2.typeType && this.symbol === t2.symbol;
+    }
 
     getSymbols() {
         return [this.symbol];
     }
     alphaConvert(rs) {
-        return new UnboundType(this.symbol in rs ? rs[this.symbol] : this.symbol);
-    }
-    betaReduce(rs) {
-        return this.symbol in rs ? rs[this.symbol].clone() : new UnboundType(this.symbol);
-    }
-
-    equals(t3) {
-        return this.type === t3.type && this.symbol === t3.symbol;
-    }
-    matches(t3) {
-        let rs = {};
-        rs[this.symbol] = t3;
-        if (t3.type !== this.type) return [rs];
-        let rs2 = {};
-        rs2[t3.symbol] = this;
-        return [rs, rs2];
+        if (this.symbol in rs)
+            return new UnboundType(rs[this.symbol]);
+        return this.clone();
     }
 
-    toString() {
-        return this.symbol;
+    canMatch(t2) {
+        return true;
+    }
+    getConstraints(t2) {
+        let ret = [[this.symbol, t2]];
+        if (t2.typeType === Type.UNBOUND) {
+            ret.push([t2.symbol, this]);
+        }
+        return ret;
+    }
+    substituteConstraint(s, t) {
+        return this.symbol === s ? t.clone() : this.clone();
     }
 
 }
 
 class FunctionType extends Type {
 
-    type = Type.FUNCTION;
+    typeType = Type.FUNCTION;
 
     constructor(t1, t2) {
         super();
@@ -148,32 +203,43 @@ class FunctionType extends Type {
     clone() {
         return new FunctionType(this.t1.clone(), this.t2.clone());
     }
+    toString() {
+        return `(${this.t1} -> ${this.t2})`;
+    }
+
+    equals(t3) {
+        return this.typeType === t3.typeType && this.t1.equals(t3.t1) && this.t2.equals(t3.t2);
+    }
 
     getSymbols() {
-        return [...new Set([...this.t1.getSymbols(), ...this.t2.getSymbols()])];
+        return this.t1.getSymbols().concat(this.t2.getSymbols());
     }
     alphaConvert(rs) {
         return new FunctionType(this.t1.alphaConvert(rs), this.t2.alphaConvert(rs));
     }
-    betaReduce(rs) {
-        return new FunctionType(this.t1.betaReduce(rs), this.t2.betaReduce(rs));
-    }
 
-    equals(t3) {
-        return this.type === t3.type && this.t1.equals(t3.t1) && this.t2.equals(t3.t2);
-    }
-    matches(t3) {
-        switch (t3.type) {
+    canMatch(t3) {
+        switch (t3.typeType) {
             case Type.APPLICATION:
-                return [false];
+                return false;
+            case Type.LITERAL:
+                return false;
             case Type.FUNCTION:
-                return [this.t1.matches(t3.t1), this.t2.matches(t3.t2)].flat();
+                return this.t1.canMatch(t3.t1) && this.t2.canMatch(t3.t2);
             case Type.UNBOUND:
-                return t3.matches(this);
-            case Type.VARIABLE:
-                return [false];
+                return true;
         }
     }
+    getConstraints(t3) {
+        if (t3.typeType === Type.UNBOUND) {
+            return t3.getConstraints(this);
+        }
+        return this.t1.getConstraints(t3.t1).concat(this.t2.getConstraints(t3.t2));
+    }
+    substituteConstraint(s, t) {
+        return new FunctionType(this.t1.substituteConstraint(s, t), this.t2.substituteConstraint(s, t));
+    }
+
     bind(t3) {
         let s1 = this.getSymbols();
         let s2 = t3.getSymbols();
@@ -194,65 +260,26 @@ class FunctionType extends Type {
             t3 = t3.alphaConvert(replacements);
         }
 
-        let objects = [this.t1.matches(t3)].flat();
-        if (objects.includes(false)) {
-            console.log("Can't bind.");
-            return;
-        }
-        objects = objects.filter(r => typeof r === "object");
-        let rs = {};
-        for (let object of objects) {
-            let key = Object.keys(object);
-            let value = object[key];
-            if (!(key in rs))
-                rs[key] = [];
-            rs[key].push(value);
+        if (!this.t1.canMatch(t3))
+            throw `Cannot bind ${t3} to ${this}.`
+
+        let cs = this.t1.getConstraints(t3);
+        let ucs = this.unifyConstraints(cs);
+        
+        let rt2 = this.t2.clone();
+        for (let s in ucs) {
+            rt2 = rt2.substituteConstraint(s, ucs[s]);
         }
 
-        let replacements = {};
-        while (Object.keys(rs).length) {
-
-            let filtered = {};
-            for (let key in rs) {
-                filtered[key] = rs[key].filter(t => t.type !== Type.UNBOUND);
-            }
-            let keys = Object.keys(rs).sort((a, b) => filtered[a].length - filtered[b].length);
-            let key = keys.pop();
-            let values = filtered[key];
-            let replacement = values.pop();
-            delete rs[key];
-
-            for (let v of values) {
-                if (replacement.equals(v)) continue;
-
-                let objects2 = replacement.matches(v).flat();
-                if (objects2.includes(false)) {
-                    console.log("Incompatible types?");
-                    console.log(""+replacement, ""+v);
-                    console.log("Can't bind.");
-                    return;
-                }
-                for (let object of objects2) {
-                    let key = Object.keys(object);
-                    let value = object[key];
-                    if (!(key in rs))
-                        rs[key] = [];
-                    rs[key].push(value);
-                }
-            }
-
-            replacements[key] = replacement;
-            for (let rsKey in rs) {
-                rs[rsKey] = rs[rsKey].map(t => t.type !== Type.UNBOUND || t.symbol !== key ? t : replacement);
-            }
-
-        }
-
-        return this.t2.betaReduce(replacements);
-    }
-
-    toString() {
-        return `(${this.t1} -> ${this.t2})`;
+        return rt2;
     }
 
 }
+
+let a = new UnboundType("a");
+let b = new UnboundType("b");
+
+let int = new LiteralType("Integer");
+let str = new LiteralType("String");
+
+let a_b_a_b = new FunctionType(a, new FunctionType(b, new FunctionType(a, b)));

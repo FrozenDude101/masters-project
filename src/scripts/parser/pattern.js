@@ -27,13 +27,13 @@ class PatternNode {
     toArgument() {
         switch (this.type) {
             case PatternNode.INTEGER:
-                return new LiteralArgument(this.value, new VariableType("Integer"));
+                return new LiteralArgument(this.value, new LiteralType("Integer"));
             case PatternNode.FLOAT:
-                return new LiteralArgument(this.value, new VariableType("Float"));
+                return new LiteralArgument(this.value, new LiteralType("Float"));
             case PatternNode.CHAR:
-                return new LiteralArgument(this.value, new VariableType("Char"));
+                return new LiteralArgument(this.value, new LiteralType("Char"));
             case PatternNode.STRING:
-                return new LiteralArgument(this.value, new VariableType("String"));
+                return new LiteralArgument(this.value, new LiteralType("String"));
             case PatternNode.VAR:
                 return new VariableArgument(this.value);
         }

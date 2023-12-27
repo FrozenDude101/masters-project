@@ -17,7 +17,6 @@ codeInput.addEventListener("input", () => {
         cytoscapeContainer.innerHTML = "";
 
         console.log("Parsing");
-        console.table(tokens);
         let program = parse(tokens);
 
         for (let f in program.functions) {
