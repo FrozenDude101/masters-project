@@ -36,4 +36,19 @@ class Pattern {
         return this.args.reduce((a, v) => a+", "+v);
     }
 
+    getConstraints(t1) {
+        let cs = [];
+        for (let i = 0; i < this.length(); i++) {
+            let t = t1 instanceof FunctionType ? t1.t1 : t1;
+            cs.push(...this.args[i].getConstraints(t))
+            t1 = t1.t2;
+        }
+        return cs;
+    }
+    applyConstraints(cs) {
+        for (let a of this.args) {
+            a.applyConstraints(cs);
+        }
+    }
+
 }

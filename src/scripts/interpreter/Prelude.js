@@ -13,7 +13,6 @@ let pred = new JSThunk("pred", (a) => a-1, new FunctionType(new LiteralType("Int
 Program.register("pred", pred);
 
 
-
 let test = new ApplicationThunk(
     symbol_plus,
     new UnboundThunk("a"),

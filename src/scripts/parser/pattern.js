@@ -35,7 +35,7 @@ class PatternNode {
             case PatternNode.STRING:
                 return new LiteralArgument(this.value, new LiteralType("String"));
             case PatternNode.VAR:
-                return new VariableArgument(this.value);
+                return new UnboundArgument(this.value);
         }
     }
 

@@ -5,7 +5,7 @@ class EArgument {
 
 }
 
-class VariableArgument {
+class UnboundArgument {
 
     argumentType = EArgument.VARIABLE;
 
@@ -27,6 +27,15 @@ class VariableArgument {
 
     getSymbols() {
         return [this.symbol];
+    }
+
+    getConstraints(t1) {
+        return [[this.symbol, t1]];
+    }
+    applyConstraints(cs) {
+        if (this.symbol in cs) {
+            this.type = this.symbol;
+        }
     }
 
 }
@@ -67,6 +76,13 @@ class LiteralArgument {
     }
     getSymbols() {
         return [];
+    }
+
+    getConstraints(t1) {
+        return [];
+    }
+    applyConstraints(cs) {
+        return;
     }
 
 }

@@ -45,6 +45,10 @@ class ApplicationThunk {
     replaceUnboundThunks(rs) {
         return new ApplicationThunk(this.t1.replaceUnboundThunks(rs), this.t2.replaceUnboundThunks(rs));
     }
+    applyConstraints(cs) {
+        this.t1.applyConstraints(cs);
+        this.t2.applyConstraints(cs);
+    }
 
 }
 
@@ -69,6 +73,9 @@ class LiteralThunk {
 
     replaceUnboundThunks(rs) {
         return this;
+    }
+    applyConstraints(cs) {
+        return;
     }
 
 }
@@ -99,6 +106,10 @@ class FunctionThunk {
         if (patternLength !== -Infinity && pattern.length() !== patternLength)
             throw "All patterns must have any equal number of arguments.";
 
+        let constraints = pattern.getConstraints(this.type);
+        constraints = new Type().unifyConstraints(constraints);
+        impl.applyConstraints(constraints)
+
         this.patterns.push(pattern);
         pattern.parent = this;
         this.implementations.push(impl);
@@ -106,7 +117,7 @@ class FunctionThunk {
     }
 
     bind(t1) {
-        let nextFunction = new FunctionThunk(`${this.name}$${t1}`, this.type.bind(t1.getContextFreeType()));
+        let nextFunction = new FunctionThunk(`${this.name}$${t1}`, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
 
@@ -151,6 +162,25 @@ class FunctionThunk {
         }
         return nextFunction;
     }
+    applyConstraints(cs) {
+        for (let i = 0; i < this.patterns.length; i++) {
+            let patt = this.patterns[i];
+            let impl = this.implementations[i];
+
+            let overwritten = patt.getSymbols();
+
+            let cs2 = {};
+            for (let c in cs) {
+                if (overwritten.includes(c))
+                    continue
+                cs2[c] = cs[c];
+            }
+
+            patt.applyConstraints(cs2);
+            impl.applyConstraints(cs2);
+        }
+        return this;
+    }
 
 }
 
@@ -178,6 +208,10 @@ class UnboundThunk {
             return rs[this.symbol];
         return this;
     }
+    applyConstraints(cs) {
+        if (this.symbol in cs)
+            this.type = cs[this.symbol];
+    }
 
 }
 
@@ -203,7 +237,7 @@ class JSThunk {
 
         let value = t1.value;
         let result = this.func(value);
-        let type = this.type.bind(t1.getContextFreeType());
+        let type = this.type.bind(t1.type);
         
         if (result instanceof Function)
             return new JSThunk(`${this.name}$${value}`, result, type);
@@ -216,6 +250,9 @@ class JSThunk {
 
     replaceUnboundThunks(rs) {
         return this;
+    }
+    applyConstraints(cs) {
+        return;
     }
 
 }
