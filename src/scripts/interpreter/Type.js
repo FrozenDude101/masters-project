@@ -282,4 +282,7 @@ let b = new UnboundType("b");
 let int = new LiteralType("Integer");
 let str = new LiteralType("String");
 
+let maybe = new LiteralType("Maybe");
+let maybe_int = new ApplicationType(maybe, int);
+
 let a_b_a_b = new FunctionType(a, new FunctionType(b, new FunctionType(a, b)));

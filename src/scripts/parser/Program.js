@@ -58,7 +58,7 @@ class Program {
 
     convertToThunks() {
         for (let f in this.functions) {
-            let thunk = new FunctionThunk(f);
+            let thunk = new FunctionThunk(f, this.functions[f].type.toType());
             Program.register(f, thunk);
             let data = this.functions[f];
             for (let i = 0; i < data.patterns.length; i++) {

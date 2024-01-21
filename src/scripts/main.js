@@ -39,7 +39,7 @@ codeInput.addEventListener("input", () => {
             functionSelector.innerHTML += `<option>${f}</option>`
         }
 
-    }, 1);
+    }, 1000);
 });
 
 codeInput.dispatchEvent(new InputEvent("input"));

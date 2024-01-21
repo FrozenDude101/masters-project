@@ -13,7 +13,9 @@ class ApplicationThunk {
     thunkType = EThunk.APPLICATION;
 
     constructor(t1, t2) {
+        t1.parent = this;
         this.t1 = t1;
+        t2.parent = this;
         this.t2 = t2;
     }
     clone() {
@@ -22,11 +24,7 @@ class ApplicationThunk {
     toString() {
         return `{${this.t1} ${this.t2}}`;
     }
-
-    getType() {
-        return this.t1.getType().bind(this.t2.getType());
-    }
-
+    
     canStep() {
         return true;
     }
@@ -63,10 +61,6 @@ class LiteralThunk {
         return `${this.value}`;
     }
 
-    getType() {
-        return this.type;
-    }
-
     canStep() {
         return false;
     }
@@ -81,26 +75,21 @@ class FunctionThunk {
 
     thunkType = EThunk.FUNCTION;
 
-    constructor(name) {
-
+    constructor(name, type) {
         this.name = name;
+        this.type = type;
         this.patterns        = []
         this.implementations = []
     }
     clone() {
-        return new FunctionThunk(this.name, this.patterns.map((p,i) => [p, this.implementations[i].clone()]).flat())
+        let fT = new FunctionThunk(this.name, this.type.clone());
+        for (let i = 0; i < this.patterns.length; i++) {
+            fT.setCase(this.patterns[i].clone(), this.implementations[i].clone());
+        }
+        return fT;
     }
     toString() {
         return `${this.name}`;
-    }
-
-    getType() {
-        let pTypes = this.patterns[0].args.map(a => a.getType());
-        let type  = this.implementations[0].getType();
-        do {
-            type = new FunctionType(pTypes.pop(), type);
-        } while (pTypes.length);
-        return type;
     }
 
     setCase(pattern, impl) {
@@ -109,11 +98,13 @@ class FunctionThunk {
             throw "All patterns must have any equal number of arguments.";
 
         this.patterns.push(pattern);
+        pattern.parent = this;
         this.implementations.push(impl);
+        impl.parent = this;
     }
 
     bind(t1) {
-        let nextFunction = new FunctionThunk(`${this.name}$${t1}`);
+        let nextFunction = new FunctionThunk(`${this.name}$${t1}`, this.type.bind(t1.getContextFreeType()));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
 
@@ -138,7 +129,7 @@ class FunctionThunk {
     }
 
     replaceUnboundThunks(rs) {
-        let nextFunction = new FunctionThunk(`${this.name}`);
+        let nextFunction = new FunctionThunk(`${this.name}`, this.type.clone());
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
             let impl = this.implementations[i];
@@ -167,16 +158,13 @@ class UnboundThunk {
 
     constructor(symbol) {
         this.symbol = symbol;
+        this.type = new UnboundType(this.symbol);
     }
     clone() {
         return this;
     }
     toString() {
         return `${this.symbol}`;
-    }
-
-    getType() {
-        return new UnboundType(this.symbol);
     }
 
     canStep() {
@@ -207,23 +195,18 @@ class JSThunk {
         return this.name;
     }
 
-    getType() {
-        return this.type;
-    }
-
     bind(t1) {
         if (t1.canStep())
             return new ApplicationThunk(this, t1.step());
 
         let value = t1.value;
         let result = this.func(value);
-        let type = this.type.bind(t1.getType());
+        let type = this.type.bind(t1.getContextFreeType());
         
-        console.log(result);
         if (result instanceof Function)
             return new JSThunk(`${this.name}$${value}`, result, type);
 
-        return new LiteralThunk(result);
+        return new LiteralThunk(result, type);
     }
     canStep() {
         return false;

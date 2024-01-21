@@ -11,13 +11,10 @@ class VariableArgument {
 
     constructor(symbol) {
         this.symbol = symbol;
+        this.type = new UnboundType(this.symbol);
     }
     toString() {
         return `${this.symbol}`;
-    }
-
-    getType() {
-        return new UnboundType(this.symbol);
     }
 
     requiresSteps(t) {
@@ -40,32 +37,30 @@ class LiteralArgument {
 
     constructor(value) {
         this.value = value;
+        switch (typeof this.value) {
+            case "boolean":
+                this.type = new LiteralType("Bool");
+            case "number":
+                if (Number.isInteger(this.value))
+                    this.type = new LiteralType("Integer");
+                else
+                    this.type = new LiteralType("Float");
+            case "string":
+                this.type = new LiteralType("String");
+            default:
+                this.type = `Unknown value type for ${this.value}`;
+        }
     }
     toString() {
         return `${this.value}`;
-    }
-
-    getType() {
-        switch (typeof this.value) {
-            case "boolean":
-                return new LiteralType("Bool");
-            case "number":
-                return new LiteralType("Integer");
-            case "string":
-                return new LiteralType("String");
-            default:
-                throw `Unknown value type for ${this.value}`;
-        }
     }
 
     requiresSteps(t) {
         return t.canStep();
     }
     matches(t,_) {
-        console.log(t.thunkType, EThunk.LITERAL);
         if (t.thunkType !== EThunk.LITERAL)
             return false;
-        console.log(t.value, this.value);
         if (t.value !== this.value)
             return false;
         return true;

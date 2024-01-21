@@ -30,6 +30,27 @@ class TypeNode {
 
     }
 
+    toType() {
+        switch (this.type) {
+            case TypeNode.TYVAR:
+                return new UnboundType(this.value);
+            case TypeNode.TYCON:
+                return new LiteralType(this.value);
+            case TypeNode.TYAPP:
+                return new ApplicationType(
+                    this.children[0].toType(),
+                    this.children[1].toType(),
+                );
+            case TypeNode.ARROW:
+                return new FunctionType(
+                    this.children[0].toType(),
+                    this.children[1].toType(),
+                );
+            case TypeNode.LIST:
+                throw "Not yet implemented."
+        }
+    }
+
 }
 
 function parseType(tokens, endChar = "\n") {

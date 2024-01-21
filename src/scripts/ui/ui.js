@@ -42,4 +42,5 @@ function displayState() {
 }
 function displayResult() {
     RETURN_VALUE.value = state;
+    RETURN_TYPE.value = state.getType();
 }

@@ -15,13 +15,13 @@ function setupState() {
                 state = new ApplicationThunk(state, Program.get(value));
                 break;
             case "Integer":
-                state = new ApplicationThunk(state, new LiteralThunk(parseInt(value)));
+                state = new ApplicationThunk(state, new LiteralThunk(parseInt(value), new LiteralType("Integer")));
                 break;
             case "Float":
-                state = new ApplicationThunk(state, new LiteralThunk(parseFloat(value)));
+                state = new ApplicationThunk(state, new LiteralThunk(parseFloat(value), new LiteralType("Float")));
                 break;
             case "String":
-                state = new ApplicationThunk(state, new LiteralThunk(value));
+                state = new ApplicationThunk(state, new LiteralThunk(value), new LiteralType("String"));
                 break;
             case "None":
                 addError(`No type specified for argument ${i}.`);
@@ -59,7 +59,11 @@ function step() {
         displayState();
         return;
     }
+    if (!state.canStep()) {
+        displayResult();
+        return;
+    }
     state = state.step();
     displayState();
-    return null;
+    return;
 }

@@ -2,9 +2,8 @@ class Pattern {
 
     constructor(...args) {
         this.args = args;
-    }
-    static p(s) {
-        // TODO: parse a Pattern from a string
+        for (let a of args)
+            a.parent = this;
     }
 
     length() {
