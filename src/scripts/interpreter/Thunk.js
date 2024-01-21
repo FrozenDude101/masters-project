@@ -17,6 +17,8 @@ class ApplicationThunk {
         this.t1 = t1;
         t2.parent = this;
         this.t2 = t2;
+
+        this.type = this.t1.type.bind(this.t2.type);
     }
     clone() {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
@@ -24,7 +26,7 @@ class ApplicationThunk {
     toString() {
         return `{${this.t1} ${this.t2}}`;
     }
-    
+
     canStep() {
         return true;
     }
