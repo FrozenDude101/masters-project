@@ -204,6 +204,8 @@ class FunctionThunk {
                 cs2[c] = cs[c];
             }
 
+            if (Object.keys(cs2).length === 0) continue;
+
             patt.applyConstraints(cs2);
             impl.applyConstraints(cs2);
         }
