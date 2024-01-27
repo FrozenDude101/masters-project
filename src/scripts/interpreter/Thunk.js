@@ -108,7 +108,7 @@ class FunctionThunk {
 
         let constraints = pattern.getConstraints(this.type);
         constraints = new Type().unifyConstraints(constraints);
-        impl.applyConstraints(constraints)
+        impl.applyConstraints(constraints);
 
         this.patterns.push(pattern);
         pattern.parent = this;
