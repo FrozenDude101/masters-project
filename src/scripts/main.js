@@ -1,6 +1,5 @@
 
 let codeInput          = document.getElementById("code-input");
-let cytoscapeContainer = document.getElementById("ctyoscape-container");
 
 let functionSelector   = document.getElementById("function-selector");
 
@@ -8,37 +7,18 @@ let parseTimeout = null;
 codeInput.addEventListener("input", () => {
     clearTimeout(parseTimeout);
     parseTimeout = setTimeout(() => {
-        console.log("Lexing");
         let input = LexerInput.fromInput(CODE_INPUT.value + "\n");
+
         let tokens = Lexer.lexer(t_program)(input)[0].tokens;
         tokens = tokens.filter((t) => t.type !== Token.WHITESPACE || t.value.includes("\n"));
         tokens = tokens.map((t) => t.value.includes("\n") ? new Token(Token.SPECIAL, "\n", t.index) : t);
 
-        cytoscapeContainer.innerHTML = "";
-
-        console.log("Parsing");
         let program = parse(tokens);
-
-        for (let f in program.functions) {
-            let type = program.functions[f].type;
-            let patterns = program.functions[f].patterns;
-            let implementations = program.functions[f].implementations;
-
-            let contents = `${f}<br>${type}<br>`;
-            for (let i = 0; i < patterns.length; i++) {
-                contents += `${patterns[i]} = ${implementations[i]}<br>`;
-            }
-            contents += "<br>";
-
-            cytoscapeContainer.innerHTML += contents;
-            
-        }
 
         functionSelector.innerHTML = `<option>${NO_SELECTION}</option>`;
         for (let f in program.functions) {
             functionSelector.innerHTML += `<option>${f}</option>`
         }
-
     }, 1000);
 });
 

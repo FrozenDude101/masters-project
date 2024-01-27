@@ -37,9 +37,6 @@ function hasErrors() {
     return ERROR_CONTAINER.children.length !== 0;
 }
 
-function displayState() {
-    cytoscapeContainer.innerHTML = ""+state;
-}
 function displayResult() {
     RETURN_VALUE.value = state;
     RETURN_TYPE.value = state.type;

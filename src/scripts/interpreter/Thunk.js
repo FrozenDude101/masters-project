@@ -50,6 +50,26 @@ class ApplicationThunk {
         this.t2.applyConstraints(cs);
     }
 
+    getGraphElements() {
+        let children = [...this.t1.getGraphElements(), ...this.t2.getGraphElements()]
+        for (let c of children) {
+            console.log(this.toString());
+            if (c.data.parent) continue;
+            c.data.parent = this.toString();
+        }
+        return [
+            {data: {
+                id: this.toString()+"edge",
+                source: this.t2.toString(),
+                target: this.t1.toString(),
+            }},
+            {data: {
+                id: this.toString(),
+            }},
+            ...children,
+        ];
+    }
+
 }
 
 class LiteralThunk {
@@ -76,6 +96,14 @@ class LiteralThunk {
     }
     applyConstraints(cs) {
         return;
+    }
+
+    getGraphElements() {
+        return [{
+            data: {
+                id: this.toString(),
+            },
+        }];
     }
 
 }
@@ -182,6 +210,14 @@ class FunctionThunk {
         return this;
     }
 
+    getGraphElements() {
+        return [{
+            data: {
+                id: this.toString(),
+            },
+        }];
+    }
+
 }
 
 class UnboundThunk {
@@ -211,6 +247,14 @@ class UnboundThunk {
     applyConstraints(cs) {
         if (this.symbol in cs)
             this.type = cs[this.symbol];
+    }
+
+    getGraphElements() {
+        return [{
+            data: {
+                id: this.toString(),
+            },
+        }];
     }
 
 }
@@ -253,6 +297,14 @@ class JSThunk {
     }
     applyConstraints(cs) {
         return;
+    }
+
+    getGraphElements() {
+        return [{
+            data: {
+                id: this.toString(),
+            },
+        }];
     }
 
 }
