@@ -33,13 +33,14 @@ class Pattern {
     }
 
     toString() {
-        return this.args.reduce((a, v) => a+", "+v);
+        return ""+this.args.reduce((a, v) => a+", "+v);
     }
 
     getConstraints(t1) {
         let cs = [];
         for (let i = 0; i < this.length(); i++) {
             let t = t1 instanceof FunctionType ? t1.t1 : t1;
+            console.log(""+t);
             cs.push(...this.args[i].getConstraints(t))
             t1 = t1.t2;
         }

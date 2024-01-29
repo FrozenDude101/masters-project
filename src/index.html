@@ -53,12 +53,9 @@
                 <textarea class="highlight-sync" id="code-input" rows=25 cols=50>id :: a -> a
 id a = a
 
-add :: Integer -> Integer -> Integer
-add a b = a + b
-
-multiply :: Integer -> Integer -> Integer
-multiply 0 b = 0
-multiply a b = add b (multiply (pred a) b)</textarea>
+foo :: (a -> a) -> a -> a
+foo f a = f a
+                </textarea>
             </div>
             <div id="scrollable-container">
                 <div id="error-container"></div>

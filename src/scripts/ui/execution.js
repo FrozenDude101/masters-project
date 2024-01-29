@@ -32,6 +32,8 @@ function setupState() {
     if (hasErrors())
         state = null;
 
+    state.applyConstraints({});
+
 }
 
 let executeInterval = null;

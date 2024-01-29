@@ -17,8 +17,6 @@ class ApplicationThunk {
         this.t1 = t1;
         t2.parent = this;
         this.t2 = t2;
-
-        this.type = this.t1.type.bind(this.t2.type);
     }
     clone() {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
@@ -48,26 +46,7 @@ class ApplicationThunk {
     applyConstraints(cs) {
         this.t1.applyConstraints(cs);
         this.t2.applyConstraints(cs);
-    }
-
-    getGraphElements() {
-        let children = [...this.t1.getGraphElements(), ...this.t2.getGraphElements()]
-        for (let c of children) {
-            console.log(this.toString());
-            if (c.data.parent) continue;
-            c.data.parent = this.toString();
-        }
-        return [
-            {data: {
-                id: this.toString()+"edge",
-                source: this.t2.toString(),
-                target: this.t1.toString(),
-            }},
-            {data: {
-                id: this.toString(),
-            }},
-            ...children,
-        ];
+        this.type = this.t1.type.bind(this.t2.type);
     }
 
 }
@@ -98,14 +77,6 @@ class LiteralThunk {
         return;
     }
 
-    getGraphElements() {
-        return [{
-            data: {
-                id: this.toString(),
-            },
-        }];
-    }
-
 }
 
 class FunctionThunk {
@@ -126,7 +97,7 @@ class FunctionThunk {
         return fT;
     }
     toString() {
-        return `${this.name}`;
+        return this.name;
     }
 
     setCase(pattern, impl) {
@@ -145,7 +116,7 @@ class FunctionThunk {
     }
 
     bind(t1) {
-        let nextFunction = new FunctionThunk(`${this.name}$${t1}`, this.type.bind(t1.type));
+        let nextFunction = new FunctionThunk(`${this.name} ${t1}`, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
 
@@ -212,14 +183,6 @@ class FunctionThunk {
         return this;
     }
 
-    getGraphElements() {
-        return [{
-            data: {
-                id: this.toString(),
-            },
-        }];
-    }
-
 }
 
 class UnboundThunk {
@@ -251,14 +214,6 @@ class UnboundThunk {
             this.type = cs[this.symbol];
     }
 
-    getGraphElements() {
-        return [{
-            data: {
-                id: this.toString(),
-            },
-        }];
-    }
-
 }
 
 class JSThunk {
@@ -286,7 +241,7 @@ class JSThunk {
         let type = this.type.bind(t1.type);
         
         if (result instanceof Function)
-            return new JSThunk(`${this.name}$${value}`, result, type);
+            return new JSThunk(`${this.name} ${value}`, result, type);
 
         return new LiteralThunk(result, type);
     }
@@ -299,14 +254,6 @@ class JSThunk {
     }
     applyConstraints(cs) {
         return;
-    }
-
-    getGraphElements() {
-        return [{
-            data: {
-                id: this.toString(),
-            },
-        }];
     }
 
 }
