@@ -37,10 +37,7 @@
         <script src = "scripts/interpreter/Arguments.js" defer></script>
         <script src = "scripts/interpreter/Prelude.js" defer></script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.27.0/cytoscape.min.js" integrity="sha512-ZNCw/dHSJygOg60ih5fI0f2RKqa8EeVm2ivm3PcrD6SEv2WzK8VJoe5IxS4QzvLcaSIQeaxgZMRCW01QlVJTZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
         <script src = "scripts/main.js" defer></script>
-
     </head>
 
     <body id="body">
@@ -50,12 +47,17 @@
                     <div class="highlight-sync" id="highlights">
                     </div>
                 </div>
-                <textarea class="highlight-sync" id="code-input" rows=25 cols=50>id :: a -> a
+                <textarea class="highlight-sync" id="code-input" rows=25 cols=50>
+id :: a -> a
 id a = a
 
-foo :: (a -> a) -> a -> a
-foo f a = f a
-                </textarea>
+add :: Integer -> Integer -> Integer
+add a b = a + b
+
+multiply :: Integer -> Integer -> Integer
+multiply 0 b = 0
+multiply a b = add b (multiply (pred a) b)
+</textarea>
             </div>
             <div id="scrollable-container">
                 <div id="error-container"></div>

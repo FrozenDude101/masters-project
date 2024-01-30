@@ -13,6 +13,9 @@ class UnboundArgument {
         this.symbol = symbol;
         this.type = new UnboundType(this.symbol);
     }
+    clone() {
+        return new UnboundArgument(this.symbol);
+    }
     toString() {
         return `${this.symbol}`;
     }
@@ -34,7 +37,7 @@ class UnboundArgument {
     }
     applyConstraints(cs) {
         if (this.symbol in cs) {
-            this.type = this.symbol;
+            this.type = cs[this.symbol];
         }
     }
 
@@ -59,6 +62,9 @@ class LiteralArgument {
             default:
                 this.type = `Unknown value type for ${this.value}`;
         }
+    }
+    clone() {
+        return new LiteralArgument(this.value);
     }
     toString() {
         return `${this.value}`;

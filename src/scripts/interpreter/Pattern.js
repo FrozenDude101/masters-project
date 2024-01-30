@@ -5,6 +5,9 @@ class Pattern {
         for (let a of args)
             a.parent = this;
     }
+    clone() {
+        return new Pattern(...this.args.map(a => a.clone()));
+    }
 
     length() {
         return this.args.length;
@@ -40,7 +43,6 @@ class Pattern {
         let cs = [];
         for (let i = 0; i < this.length(); i++) {
             let t = t1 instanceof FunctionType ? t1.t1 : t1;
-            console.log(""+t);
             cs.push(...this.args[i].getConstraints(t))
             t1 = t1.t2;
         }

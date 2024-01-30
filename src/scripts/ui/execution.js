@@ -33,7 +33,6 @@ function setupState() {
         state = null;
 
     state.applyConstraints({});
-
 }
 
 let executeInterval = null;

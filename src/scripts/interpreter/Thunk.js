@@ -1,3 +1,7 @@
+// TODO Refactor types.
+// Allow easier pass by reference, so modifying deeper thunks doesn't
+// require remaking the entire thunk tree.
+
 class EThunk {
 
     static APPLICATION = "application";
@@ -19,10 +23,17 @@ class ApplicationThunk {
         this.t2 = t2;
     }
     clone() {
-        return new ApplicationThunk(this.t1.clone(), this.t2.clone());
+        return new ApplicationThunk(this.t1.clone(), this.t2.clone(), true);
     }
     toString() {
-        return `{${this.t1} ${this.t2}}`;
+        if (this.t2 instanceof ApplicationThunk) {
+            return `${this.t1} (${this.t2})`;
+        }
+        return `${this.t1} ${this.t2}`;
+    }
+
+    get type() {
+        return this.t1.type.bind(this.t2.type);
     }
 
     canStep() {
@@ -31,7 +42,7 @@ class ApplicationThunk {
     step() {
         switch (this.t1.thunkType) {
             case EThunk.APPLICATION:
-                return new ApplicationThunk(this.t1.step(), this.t2);
+                return new ApplicationThunk(this.t1.step(), this.t2, true);
             case EThunk.FUNCTION:
             case EThunk.JAVASCRIPT:
                 return this.t1.bind(this.t2);
@@ -41,14 +52,12 @@ class ApplicationThunk {
     }
 
     replaceUnboundThunks(rs) {
-        return new ApplicationThunk(this.t1.replaceUnboundThunks(rs), this.t2.replaceUnboundThunks(rs));
+        return new ApplicationThunk(this.t1.replaceUnboundThunks(rs), this.t2.replaceUnboundThunks(rs), true);
     }
     applyConstraints(cs) {
         this.t1.applyConstraints(cs);
         this.t2.applyConstraints(cs);
-        this.type = this.t1.type.bind(this.t2.type);
     }
-
 }
 
 class LiteralThunk {
@@ -60,7 +69,7 @@ class LiteralThunk {
         this.type = type;
     }
     clone() {
-        return this;
+        return new LiteralThunk(this.value, this.type);
     }
     toString() {
         return `${this.value}`;
@@ -76,7 +85,6 @@ class LiteralThunk {
     applyConstraints(cs) {
         return;
     }
-
 }
 
 class FunctionThunk {
@@ -116,13 +124,14 @@ class FunctionThunk {
     }
 
     bind(t1) {
-        let nextFunction = new FunctionThunk(`${this.name} ${t1}`, this.type.bind(t1.type));
+        let name = `${this.name} ${t1}`;
+        let nextFunction = new FunctionThunk(name, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
 
             if (patt.requiresSteps(t1))
-                return new ApplicationThunk(this, t1.step());
-
+                return new ApplicationThunk(this, t1.step(), true);
+            
             let rs = patt.matches(t1);
             if (!rs)
                 continue;
@@ -130,9 +139,9 @@ class FunctionThunk {
 
             patt = patt.next();
             if (patt.finishedMatching()) {
-                return impl;
+                return new GraphNode(impl, name);
             }
-            nextFunction.setCase(patt, impl);
+            nextFunction.setCase(patt, new GraphNode(impl, name));
         }
         return nextFunction;
     }
@@ -182,7 +191,6 @@ class FunctionThunk {
         }
         return this;
     }
-
 }
 
 class UnboundThunk {
@@ -194,7 +202,7 @@ class UnboundThunk {
         this.type = new UnboundType(this.symbol);
     }
     clone() {
-        return this;
+        return new UnboundThunk(this.symbol);
     }
     toString() {
         return `${this.symbol}`;
@@ -213,7 +221,6 @@ class UnboundThunk {
         if (this.symbol in cs)
             this.type = cs[this.symbol];
     }
-
 }
 
 class JSThunk {
@@ -226,7 +233,7 @@ class JSThunk {
         this.type = type;
     }
     clone() {
-        return this;
+        return new JSThunk(this.name, this.func, this.type);
     }
     toString() {
         return this.name;
@@ -234,7 +241,7 @@ class JSThunk {
 
     bind(t1) {
         if (t1.canStep())
-            return new ApplicationThunk(this, t1.step());
+            return new ApplicationThunk(this, t1.step(), true);
 
         let value = t1.value;
         let result = this.func(value);
@@ -255,5 +262,4 @@ class JSThunk {
     applyConstraints(cs) {
         return;
     }
-
 }
