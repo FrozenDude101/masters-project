@@ -139,9 +139,9 @@ class FunctionThunk {
 
             patt = patt.next();
             if (patt.finishedMatching()) {
-                return new GraphNode(impl, name);
+                return impl;
             }
-            nextFunction.setCase(patt, new GraphNode(impl, name));
+            nextFunction.setCase(patt, impl, name);
         }
         return nextFunction;
     }
