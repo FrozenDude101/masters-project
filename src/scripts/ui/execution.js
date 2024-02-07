@@ -64,8 +64,11 @@ function step() {
         displayResult();
         return;
     }
-    state = state.step();
-    state.normaliseWrappers();
+    let pre = ""+state;
+    while (""+state === pre && state.canStep()) {
+        state = state.step();
+        state.normaliseWrappers();
+    }
     displayState();
     return;
 }

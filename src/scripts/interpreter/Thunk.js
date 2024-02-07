@@ -129,9 +129,9 @@ class ApplicationThunk {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
     }
     toString() {
-        if (this.t2 instanceof ApplicationThunk)
-            return `(${this.t1} (${this.t2}))`;
-        return `(${this.t1} ${this.t2})`;
+        if (this.t2.thunk instanceof ApplicationThunk)
+            return `${this.t1} (${this.t2})`;
+        return `${this.t1} ${this.t2}`;
     }
 
     canStep() {
@@ -194,7 +194,7 @@ class JSThunk {
         let type = this.type.bind(t1.type);
         
         if (result instanceof Function)
-            return new JSThunk(`${this.name}$${value}`, result, type);
+            return new JSThunk(`${this.name} ${value}`, result, type);
 
         return new LiteralThunk(result, type);
     }
@@ -243,7 +243,7 @@ class FunctionThunk {
     }
 
     bind(t1) {
-        let name = `${this.name}$${t1}`;
+        let name = `${this.name} ${t1}`;
         let nextFunction = new PartialFunctionThunk(name, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
