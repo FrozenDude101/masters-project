@@ -32,7 +32,7 @@ function setupState() {
     if (hasErrors())
         state = null;
 
-    state.applyConstraints({});
+    state = new ThunkWrapper(state);
 }
 
 let executeInterval = null;
@@ -65,6 +65,7 @@ function step() {
         return;
     }
     state = state.step();
+    state.normaliseWrappers();
     displayState();
     return;
 }

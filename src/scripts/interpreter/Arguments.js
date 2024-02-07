@@ -35,7 +35,7 @@ class UnboundArgument {
     getConstraints(t1) {
         return [[this.symbol, t1]];
     }
-    applyConstraints(cs) {
+    applyTypeConstraints(cs) {
         if (this.symbol in cs) {
             this.type = cs[this.symbol];
         }
@@ -74,9 +74,9 @@ class LiteralArgument {
         return t.canStep();
     }
     matches(t,_) {
-        if (t.thunkType !== EThunk.LITERAL)
+        if (!(t.thunk instanceof LiteralThunk))
             return false;
-        if (t.value !== this.value)
+        if (t.thunk.value !== this.value)
             return false;
         return true;
     }
@@ -87,7 +87,7 @@ class LiteralArgument {
     getConstraints(t1) {
         return [];
     }
-    applyConstraints(cs) {
+    applyTypeConstraints(cs) {
         return;
     }
 

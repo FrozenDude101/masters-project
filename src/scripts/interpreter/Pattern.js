@@ -48,9 +48,9 @@ class Pattern {
         }
         return cs;
     }
-    applyConstraints(cs) {
+    applyTypeConstraints(cs) {
         for (let a of this.args) {
-            a.applyConstraints(cs);
+            a.applyTypeConstraints(cs);
         }
     }
 
