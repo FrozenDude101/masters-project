@@ -33,11 +33,16 @@ function setupState() {
         state = null;
 
     state = new ThunkWrapper(state);
+    history = [state.clone()];
 }
 
+let history = [];
 let executeInterval = null;
 function execute() {
-    setupState();
+    if (state === null) {
+        setupState();
+        displayState();
+    }
     executeInterval = setInterval(() => {
         if (state.canStep()) {
             let e = step();
@@ -54,6 +59,33 @@ function execute() {
         }
     }, 1);
 }
+
+let stepInterval = null;
+function start() {
+    if (state === null) {
+        setupState();
+        displayState();
+    }
+    stepInterval = setInterval(() => {
+        if (state.canStep()) {
+            let e = step();
+            if (e) {
+                clearInterval(stepInterval);
+                addError(e);
+                state = null;
+            }
+        } else {
+            clearInterval(stepInterval);
+            displayState();
+            displayResult();
+            state = null;
+        }
+    }, 1000);
+}
+function stop() {
+    clearInterval(stepInterval);
+}
+
 function step() {
     if (state === null) {
         setupState();
@@ -69,6 +101,12 @@ function step() {
         state = state.step();
         state.normaliseWrappers();
     }
+    history.push(state.clone());
     displayState();
     return;
+}
+
+function reset() {
+    state = null;
+    displayState();
 }
