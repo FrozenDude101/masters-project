@@ -100,12 +100,54 @@ mark {
     margin-right: 5px;
 }
 
-#ctyoscape-container {
+.container-column {
     flex-grow: 1;
 
-    padding: 5px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+}
+.container-row {
+    flex-grow: 1;
+    
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+}
+.container {
+    flex-grow: 1;
+
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+
     background-color: #444;
     font-family: monospace;
-
     color: white;
+    font-size: large;
+    text-align: center;
+}
+
+.application {
+    border-radius: 2px;
+    padding: 2px 5px;
+}
+.application .application.hover,
+.application.hover {
+    background-color: #c7522a;
+    color: black;
+}
+.application:has(> .application.hover) {
+    background-color: #e5c185;
+}
+.application:has(> .application > .application.hover) {
+    background-color: #74a892;
+}
+.application:has(> .application > .application > .application.hover) {
+    background-color: #008585;
 }
