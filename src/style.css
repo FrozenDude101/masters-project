@@ -109,9 +109,12 @@ mark {
     align-items: stretch;
     gap: 5px;
 }
+.container-column:hover > .container {
+    background-color: #555;
+} 
 .container-row {
     flex-grow: 1;
-    
+
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -122,15 +125,24 @@ mark {
     flex-grow: 1;
 
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
 
     background-color: #444;
     font-family: monospace;
     color: white;
     font-size: large;
     text-align: center;
+
+    border-radius: 5px;
+    transition-duration: 100ms;
+}
+.container-title {
+    margin: 5px;
+    padding: 5px;
+    background-color: #666;
+    border-radius: 5px;
 }
 
 .application {

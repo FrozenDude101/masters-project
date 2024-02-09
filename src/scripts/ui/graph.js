@@ -1,8 +1,11 @@
 let cols = {
-    0: document.getElementById("cc0"),
+    "0": document.getElementById("cc0"),
 }
 let rows = {
 
+}
+let bodies = {
+    
 }
 
 function displayState() {
@@ -39,30 +42,42 @@ function createCol(id) {
     let col = document.createElement("div");
     col.classList.add("container-column");
     col.id = `cc${id}${n}`;
-    cols[`${id}${n}`] = col; 
+    cols[`${id}${n}`] = col;
 
-    let container = document.createElement("div");
-    container.classList.add("container");
-    container.id = `c${id}${n}`;
-    container.innerHTML = `
-        <button onclick="addContainer(event, '${id}${n}')">+</button>
-        <button onclick="removeContainer(event, '${id}${n}')">-</button>
-    `;
+    let container = createContainer()
 
     col.appendChild(container);
     row.appendChild(col);
     return col;
 }
+function createContainer(id) { 
+    let container = document.createElement("div");
+    container.classList.add("container");
+    container.id = `c${id}`;
 
-function addContainer(_, id) {
+    let title = document.createElement("div");
+    title.classList.add("container-title");
+    title.id = `ct${id}`;
+
+    let body = document.createElement("div");
+    body.classList.add("container-body");
+    body.id = `cb${id}`;
+
+    container.appendChild(title);
+    container.appendChild(body);
+
+    return container;
+}
+
+function addContainer(id) {
     createCol(id);
 }
-function removeContainer(_, id) {
+function removeContainer(id) {
     let n = 9;
     while (!cols[`${id}${n}`] && n >= 0) n--;
     if (n === -1) return;
     for (let i = 0; i < 10; i++) {
-        removeContainer(null, `${id}${n}`)
+        removeContainer(`${id}${n}`);
     }
     let col = cols[`${id}${n}`]
     let row = rows[id];
