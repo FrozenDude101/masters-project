@@ -8,6 +8,7 @@ class ThunkWrapper {
     }
 
     constructor(t) {
+        this.id = Math.random();
         this.t = t;
         this.normaliseWrappers();
     }
@@ -15,7 +16,17 @@ class ThunkWrapper {
         return new ThunkWrapper(this.thunk.clone());
     }
     toString() {
-        return `${this.t}`;
+        if (!(this.t instanceof ApplicationThunk))
+            return `${this.t}`;
+        let content = `${this.t}`;
+        return `
+            <span class="application"
+                id="${this.id}"
+                onclick="applicationClick(event, ${this.id})"
+                onmouseover="applicationMouseOver(event, ${this.id})"
+                onmouseout="applicationMouseOut(event, ${this.id})"
+            >${content}</span>
+        `.trim();
     }
 
     normaliseWrappers() {
@@ -122,7 +133,6 @@ class ApplicationThunk {
     }
 
     constructor(t1, t2) {
-        this.id = Math.random(); // Probably unique.
         this.t1 = new ThunkWrapper(t1);
         this.t2 = new ThunkWrapper(t2);
     }
@@ -130,19 +140,9 @@ class ApplicationThunk {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
     }
     toString() {
-        let content;
         if (this.t2.thunk instanceof ApplicationThunk)
-            content = `${this.t1} ${this.t2}`;
-        else
-            content = `${this.t1} ${this.t2}`;
-        return `
-            <span class="application"
-                id="${this.parent.id}"
-                onclick="applicationClick(event, ${this.id})"
-                onmouseover="applicationMouseOver(event, ${this.id})"
-                onmouseout="applicationMouseOut(event, ${this.id})"
-            >${content}</span>
-        `.trim();
+            return `${this.t1} (${this.t2})`;
+        return `${this.t1} ${this.t2}`;
     }
 
     canStep() {
