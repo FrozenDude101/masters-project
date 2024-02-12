@@ -32,53 +32,58 @@ function setupState() {
     if (hasErrors())
         state = null;
 
-    state = new ThunkWrapper(state);
-    history = [state.clone()];
+    states["0"] = new ThunkWrapper(state);
+
+    let container = createContainer("0");
+    cols["0"].innerHTML = "";
+    cols["0"].appendChild(container);
+
+    titles["0"].innerHTML += ""+states["0"];
 }
 
 let history = [];
 let executeInterval = null;
 function execute() {
-    if (state === null) {
+    if (states["0"] === null) {
         setupState();
         displayState();
     }
     executeInterval = setInterval(() => {
-        if (state.canStep()) {
+        if (states["0"].canStep()) {
             let e = step();
             if (e) {
                 clearInterval(executeInterval);
                 addError(e);
-                state = null;
+                states["0"] = null;
             }
         } else {
             clearInterval(executeInterval);
             displayState();
             displayResult();
-            state = null;
+            states["0"] = null;
         }
     }, 1);
 }
 
 let stepInterval = null;
 function start() {
-    if (state === null) {
+    if (states["0"] === null) {
         setupState();
         displayState();
     }
     stepInterval = setInterval(() => {
-        if (state.canStep()) {
+        if (states["0"].canStep()) {
             let e = step();
             if (e) {
                 clearInterval(stepInterval);
                 addError(e);
-                state = null;
+                states["0"] = null;
             }
         } else {
             clearInterval(stepInterval);
             displayState();
             displayResult();
-            state = null;
+            states["0"] = null;
         }
     }, 1000);
 }
@@ -87,26 +92,26 @@ function stop() {
 }
 
 function step() {
-    if (state === null) {
+    if (!states["0"]) {
         setupState();
         displayState();
         return;
     }
-    if (!state.canStep()) {
+    if (!states["0"].canStep()) {
         displayResult();
         return;
     }
-    let pre = ""+state;
-    while (""+state === pre && state.canStep()) {
-        state = state.step();
-        state.normaliseWrappers();
+    let pre = ""+states["0"];
+    while (""+states["0"] === pre && states["0"].canStep()) {
+        states["0"] = states["0"].step();
+        states["0"].normaliseWrappers();
     }
-    history.push(state.clone());
+    history.push(states["0"].clone());
     displayState();
     return;
 }
 
 function reset() {
-    state = null;
+    states["0"] = null;
     displayState();
 }

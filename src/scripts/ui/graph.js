@@ -4,24 +4,57 @@ let cols = {
 let rows = {
 
 }
+let titles = {
+
+}
 let bodies = {
     
 }
+let states = {
+
+}
+let marked = [];
 
 function displayState() {
-    containers[0].innerHTML = `${state === null ? "" : state}`;
-    cytoscapeContainer.innerHTML = `${state === null ? "" : state}`;
+    if (states["0"] === null) return;
+    for (let b in bodies) {
+        states[b].annotate(b);
+        bodies[b].innerHTML = states[b].toString(false, true);
+    }
+    for (let c of marked) {
+        removeContainer(c);
+    }
+    marked = Object.keys(states).filter(
+        k => !states[k].canStep() 
+    )
 }
 
 function applicationMouseOver(event, id) {
     event.stopPropagation();
-    document.getElementById(id).classList.add("hover");
+    for (let e of document.getElementsByClassName(id)) {
+        e.classList.add("hover");
+    }
 }
 function applicationMouseOut(event, id) {
-    document.getElementById(id).classList.remove("hover");
+    for (let e of document.getElementsByClassName(id)) {
+        e.classList.remove("hover");
+    }
 }
-function applicationClick(event, id) {
+function applicationClick(event, collection, id) {
     event.stopPropagation();
+
+    let tW = states[collection].getById(id);
+    if (states.id === id) return;
+    for (let k in states) {
+        if (states[k] === tW) return;
+    }
+
+    let cID = createCol(tW.collection).id.slice(2);
+    tW.annotate(cID);
+
+    states[cID] = tW;
+    titles[cID].innerHTML = ""+tW;
+    displayState();
 }
 
 function createRow(id) {
@@ -44,7 +77,7 @@ function createCol(id) {
     col.id = `cc${id}${n}`;
     cols[`${id}${n}`] = col;
 
-    let container = createContainer()
+    let container = createContainer(`${id}${n}`)
 
     col.appendChild(container);
     row.appendChild(col);
@@ -55,6 +88,8 @@ function createContainer(id) {
     container.classList.add("container");
     container.id = `c${id}`;
 
+    container.onclick = () => containerClick(id);
+
     let title = document.createElement("div");
     title.classList.add("container-title");
     title.id = `ct${id}`;
@@ -62,6 +97,9 @@ function createContainer(id) {
     let body = document.createElement("div");
     body.classList.add("container-body");
     body.id = `cb${id}`;
+
+    titles[id] = title;
+    bodies[id] = body;
 
     container.appendChild(title);
     container.appendChild(body);
@@ -73,18 +111,35 @@ function addContainer(id) {
     createCol(id);
 }
 function removeContainer(id) {
-    let n = 9;
-    while (!cols[`${id}${n}`] && n >= 0) n--;
-    if (n === -1) return;
+    if (id === "0") return;
+    if (!cols[`${id}`]) return;
     for (let i = 0; i < 10; i++) {
-        removeContainer(`${id}${n}`);
+        removeContainer(`${id}${i}`);
     }
-    let col = cols[`${id}${n}`]
-    let row = rows[id];
+    let col = cols[`${id}`]
+    let row = rows[id.slice(0, -1)];
     row.removeChild(col);
-    delete cols[`${id}${n}`];
-    if (n == 0) {
-        cols[`${id}`].removeChild(row);
-        delete rows[`${id}`]
+    delete cols[`${id}`];
+    delete titles[`${id}`];
+    delete bodies[`${id}`];
+    delete states[`${id}`];
+    if (row.children.length === 0) {
+        let col2 = cols[id.slice(0, -1)];
+        col2.removeChild(row);
+        delete rows[`${id.slice(0, -1)}`]
     }
 }
+
+function containerClick(id) {
+    if (!states[id]?.canStep()) {
+        removeContainer(id);
+        return;
+    };
+    let pre = ""+states[id];
+    while (""+states[id] === pre && states[id].canStep()) {
+        states[id].step();
+    }
+    displayState();
+}
+
+cols["0"].appendChild(createContainer("0"));

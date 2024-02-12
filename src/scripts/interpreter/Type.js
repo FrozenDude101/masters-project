@@ -83,13 +83,12 @@ class ApplicationType extends Type {
             case Type.FUNCTION:
                 return false;
             case Type.UNBOUND:
-                return true;
+                return false;
         }
     }
     getConstraints(t3) {
-        if (t3.typeType === Type.UNBOUND) {
-            return t3.getConstraints(this);
-        }
+        if (t3.typeType === Type.UNBOUND)
+            return [[t3.symbol, this]]
         return this.t1.getConstraints(t3.t1).concat(this.t2.getConstraints(t3.t2));
     }
     substituteConstraint(s, t) {
@@ -133,13 +132,12 @@ class LiteralType extends Type {
             case Type.FUNCTION:
                 return false;
             case Type.UNBOUND:
-                return true;
+                return false;
         }
     }
     getConstraints(t2) {
-        if (t2.typeType === Type.UNBOUND) {
-            return t2.getConstraints(this);
-        }
+        if (t2.typeType === Type.UNBOUND)
+            return [[t2.symbol, this]]
         return [];
     }
     substituteConstraint(s, t) {
@@ -151,9 +149,10 @@ class UnboundType extends Type {
 
     typeType = Type.UNBOUND;
 
-    constructor(symbol) {
+    constructor(symbol, cs=null) {
         super();
         this.symbol = symbol;
+        this.cs = cs;
     }
     clone() {
         return new UnboundType(this.symbol);
@@ -176,14 +175,19 @@ class UnboundType extends Type {
     }
 
     canMatch(t2) {
-        return true;
+        switch (t2.typeType) {
+            case Type.APPLICATION:
+                return this.cs === null;
+            case Type.LITERAL:
+                return this.cs === null;
+            case Type.FUNCTION:
+                return this.cs === null;
+            case Type.UNBOUND:
+                return this.cs === null;
+        }
     }
     getConstraints(t2) {
-        let ret = [[this.symbol, t2]];
-        if (t2.typeType === Type.UNBOUND) {
-            ret.push([t2.symbol, this]);
-        }
-        return ret;
+        return [[this.symbol, t2]]
     }
     substituteConstraint(s, t) {
         return this.symbol === s ? t.clone() : this.clone();
@@ -204,7 +208,9 @@ class FunctionType extends Type {
         return new FunctionType(this.t1.clone(), this.t2.clone());
     }
     toString() {
-        return `(${this.t1} -> ${this.t2})`;
+        if (this.t1 instanceof FunctionType)
+            return `(${this.t1}) -> ${this.t2}`;
+        return `${this.t1} -> ${this.t2}`;
     }
 
     equals(t3) {
@@ -227,13 +233,12 @@ class FunctionType extends Type {
             case Type.FUNCTION:
                 return this.t1.canMatch(t3.t1) && this.t2.canMatch(t3.t2);
             case Type.UNBOUND:
-                return true;
+                return false;
         }
     }
     getConstraints(t3) {
-        if (t3.typeType === Type.UNBOUND) {
-            return t3.getConstraints(this);
-        }
+        if (t3.typeType === Type.UNBOUND)
+            return [[t3.symbol, this]]
         return this.t1.getConstraints(t3.t1).concat(this.t2.getConstraints(t3.t2));
     }
     substituteConstraint(s, t) {
@@ -241,31 +246,12 @@ class FunctionType extends Type {
     }
 
     bind(t3) {
-        let s1 = this.getSymbols();
-        let s2 = t3.getSymbols();
-        let intersection = s1.filter(s => s2.includes(s));
-        if (intersection.length) {
-            let replacements = {};
-            let i = 0;
-            do {
-                for (let item of intersection) {
-                    replacements[item] = item + i;
-                }
-                i += 1;
-                intersection = Object.keys(replacements).filter(v =>
-                    s1.includes(replacements[v]) ||
-                    s2.includes(replacements[v])
-                );
-            } while (intersection.length);
-            t3 = t3.alphaConvert(replacements);
-        }
-
         if (!this.t1.canMatch(t3))
-            throw `Cannot bind ${t3} to ${this}.`
+            throw `Cannot bind ${t3} to ${this}`
 
         let cs = this.t1.getConstraints(t3);
         let ucs = this.unifyConstraints(cs);
-        
+
         let rt2 = this.t2.clone();
         for (let s in ucs) {
             rt2 = rt2.substituteConstraint(s, ucs[s]);
@@ -285,4 +271,6 @@ let str = new LiteralType("String");
 let maybe = new LiteralType("Maybe");
 let maybe_int = new ApplicationType(maybe, int);
 
+let a_a = new FunctionType(a, a);
+let a_b = new FunctionType(a, b);
 let a_b_a_b = new FunctionType(a, new FunctionType(b, new FunctionType(a, b)));

@@ -54,4 +54,21 @@ class Pattern {
         }
     }
 
+    applyType(t1) {
+        for (let i = 0; i < this.length(); i++) {
+            let t = t1 instanceof FunctionType ? t1.t1 : t1;
+            this.args[i].applyType(t);
+            t1 = t1.t2;
+        }
+    }
+
+    getReplacements() {
+        let rs = [];
+        for (let i = 0; i < this.length(); i++) {
+            let r = this.args[i].getReplacements();
+            rs.push(...r);
+        }
+        return rs;
+    }
+
 }

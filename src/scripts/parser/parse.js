@@ -1,5 +1,4 @@
 function parse(tokens) {
-
     p = new Program();
 
     while (tokens.length) {

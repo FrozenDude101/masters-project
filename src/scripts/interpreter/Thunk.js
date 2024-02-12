@@ -15,23 +15,31 @@ class ThunkWrapper {
     clone() {
         return new ThunkWrapper(this.thunk.clone());
     }
-    toString() {
-        if (!(this.t instanceof ApplicationThunk))
+    toString(raw=true, root=false) {
+        if (raw || !(this.t instanceof ApplicationThunk || root))
             return `${this.t}`;
-        let content = `${this.t}`;
+        let content = this.t.toString(raw);
         return `
-            <span class="application"
-                id="${this.id}"
-                onclick="applicationClick(event, ${this.id})"
+            <span class="application ${this.id}"
+                onclick="applicationClick(event, '${this.collection}', ${this.id})"
                 onmouseover="applicationMouseOver(event, ${this.id})"
                 onmouseout="applicationMouseOut(event, ${this.id})"
             >${content}</span>
         `.trim();
     }
 
+    annotate(c) {
+        this.collection = c;
+        this.t.annotate(c);
+    }
     normaliseWrappers() {
-        while (this.t instanceof ThunkWrapper)
+        while (this.t instanceof ThunkWrapper) {
+            for (let k in states) {
+                if (states[k] === this.t)
+                    states[k] = this;
+            }
             this.t = this.t.t;
+        }
         return this;
     }
 
@@ -64,6 +72,15 @@ class ThunkWrapper {
         return this;
     }
 
+    getById(id) {
+        if (this.id === id) return this;
+        return this.t.getById(id);
+    }
+
+    verifyType() {
+        this.t.verifyType();
+    }
+
 }
 
 class LiteralThunk {
@@ -79,6 +96,9 @@ class LiteralThunk {
         return `${this.value}`;
     }
 
+    annotate(c) {
+    }
+
     canStep() {
         return false;
     }
@@ -92,19 +112,29 @@ class LiteralThunk {
     applyTypeConstraints(cs) {
         return this.clone();
     }
+
+    getById(id) {
+        return null;
+    }
+
+    verifyType() {
+    }
 }
 
 class UnboundThunk {
 
     constructor(symbol, type = undefined) {
         this.symbol = symbol;
-        this.type = type === undefined ? new UnboundType(this.symbol) : type;
+        this.type = type === undefined ? new UnboundType() : type;
     }
     clone() {
         return new UnboundThunk(this.symbol, this.type.clone());
     }
     toString() {
         return `${this.symbol}`;
+    }
+
+    annotate(c) {
     }
 
     canStep() {
@@ -120,9 +150,18 @@ class UnboundThunk {
         return this;
     }
     applyTypeConstraints(cs) {
-        if (this.symbol in cs)
-            this.type = cs[this.symbol];
+        for (let c of cs) {
+            if (c[0] !== this.symbol) continue;
+            this.type = c[1].clone();
+        }
         return this;
+    }
+
+    getById(id) {
+        return null;
+    }
+
+    verifyType() {
     }
 }
 
@@ -139,10 +178,15 @@ class ApplicationThunk {
     clone() {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone());
     }
-    toString() {
+    toString(raw) {
         if (this.t2.thunk instanceof ApplicationThunk)
-            return `${this.t1} (${this.t2})`;
-        return `${this.t1} ${this.t2}`;
+            return `${this.t1.toString(raw)} (${this.t2.toString(raw)})`;
+        return `${this.t1.toString(raw)} ${this.t2.toString(raw)}`;
+    }
+
+    annotate(c) {
+        this.t1.annotate(c);
+        this.t2.annotate(c);
     }
 
     canStep() {
@@ -170,6 +214,15 @@ class ApplicationThunk {
             this.t2.applyTypeConstraints(cs)
         )
     }
+
+    getById(id) {
+        return this.t1.getById(id) || this.t2.getById(id);
+    }
+
+    verifyType() {
+        if (this.t1.typeType === Type.UNBOUND) return;
+        this.type;
+    }
 }
 
 class JSThunk {
@@ -184,6 +237,9 @@ class JSThunk {
     }
     toString() {
         return `${this.name}`;
+    }
+
+    annotate(c) {
     }
     
     canStep() {
@@ -216,6 +272,12 @@ class JSThunk {
     applyTypeConstraints(cs) {
         return this.clone();
     }
+
+    getById(id) {
+        return null;
+    }
+
+    verifyType() {};
 }
 
 class FunctionThunk {
@@ -233,21 +295,33 @@ class FunctionThunk {
         return this.name;
     }
 
+    annotate(c) {
+    }
+
     setCase(pattern, impl) {
         let patternLength = Math.max(...this.patterns.map(p => p.length()));
         if (patternLength !== -Infinity && pattern.length() !== patternLength)
             throw "All patterns must have any equal number of arguments.";
 
+        pattern.applyType(this.type);
         let constraints = pattern.getConstraints(this.type);
-        constraints = new Type().unifyConstraints(constraints);
-        impl = new ThunkWrapper(impl.applyTypeConstraints(constraints));
+        let uc = new Type().unifyConstraints(constraints);
+        pattern.applyTypeConstraints(uc);
+
+        let rs = pattern.getReplacements();
+        impl = new ThunkWrapper(impl.applyTypeConstraints(rs));
+        try {
+            impl.verifyType();
+        } catch (e) {
+            throw `${e} in function ${this.name}`
+        }
 
         this.patterns.push(pattern);
         this.implementations.push(impl);
     }
 
     canStep() {
-        return this.implementations.length === 1;
+        return this.patterns.length === 1 && this.patterns[0].length() === 0;
     }
     canBind() {
         return true;
@@ -301,25 +375,17 @@ class FunctionThunk {
         return nextFunction;
     }
     applyTypeConstraints(cs) {
-        for (let i = 0; i < this.patterns.length; i++) {
-            let patt = this.patterns[i];
-            let impl = this.implementations[i];
-
-            let overwritten = patt.getSymbols();
-
-            let cs2 = {};
-            for (let c in cs) {
-                if (overwritten.includes(c))
-                    continue
-                cs2[c] = cs[c];
-            }
-
-            if (Object.keys(cs2).length === 0) continue;
-
-            patt.applyTypeConstraints(cs2);
-            impl.applyTypeConstraints(cs2);
-        }
         return this;
+    }
+
+    getById(id) {
+        return null;
+    }
+
+    verifyType() {
+        for (let i = 0; i < this.implementations.length; i++) {
+            this.implementations[i].verifyType();
+        }
     }
 }
 
@@ -331,6 +397,33 @@ class PartialFunctionThunk extends FunctionThunk {
             pT.setCase(this.patterns[i], this.implementations[i].thunk);
         }
         return pT;
+    }
+
+    annotate(c) {
+        for (let i = 0; i < this.implementations.length; i++) {
+            this.implementations[i].annotate(c);
+        }
+    }
+    applyTypeConstraints(cs) {
+        for (let i = 0; i < this.patterns.length; i++) {
+            let patt = this.patterns[i];
+            let impl = this.implementations[i];
+
+            let overwritten = patt.getSymbols();
+
+            let cs2 = [];
+            for (let c in cs) {
+                if (overwritten.includes(c[0]))
+                    continue
+                cs2.push(c);
+            }
+
+            if (cs2.length === 0) continue;
+
+            patt.applyTypeConstraints(cs2);
+            impl.applyTypeConstraints(cs2);
+        }
+        return this;
     }
 
 }
