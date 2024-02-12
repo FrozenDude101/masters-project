@@ -81,6 +81,10 @@ class ThunkWrapper {
         this.t.verifyType();
     }
 
+    annotateTypes(n) {
+        this.t.annotateTypes();
+    }
+
 }
 
 class LiteralThunk {
@@ -119,13 +123,16 @@ class LiteralThunk {
 
     verifyType() {
     }
+
+    annotateTypes(n) {
+    }
 }
 
 class UnboundThunk {
 
     constructor(symbol, type = undefined) {
         this.symbol = symbol;
-        this.type = type === undefined ? new UnboundType() : type;
+        this.type = type === undefined ? new UnboundType(`${symbol}_unknown`) : type;
     }
     clone() {
         return new UnboundThunk(this.symbol, this.type.clone());
@@ -162,6 +169,10 @@ class UnboundThunk {
     }
 
     verifyType() {
+    }
+
+    annotateTypes(n) {
+        this.type = this.type.annotateTypes(n);
     }
 }
 
@@ -223,6 +234,11 @@ class ApplicationThunk {
         if (this.t1.typeType === Type.UNBOUND) return;
         this.type;
     }
+
+    annotateTypes(n) {
+        this.t1.annotateTypes(n);
+        this.t2.annotateTypes(n);
+    }
 }
 
 class JSThunk {
@@ -278,6 +294,9 @@ class JSThunk {
     }
 
     verifyType() {};
+
+    annotateTypes(n) {
+    }
 }
 
 class FunctionThunk {
@@ -287,6 +306,8 @@ class FunctionThunk {
         this.type = type;
         this.patterns        = []
         this.implementations = []
+
+        this.type = this.type.annotateTypes(this.name);
     }
     clone() {
         return this;
@@ -310,11 +331,8 @@ class FunctionThunk {
 
         let rs = pattern.getReplacements();
         impl = new ThunkWrapper(impl.applyTypeConstraints(rs));
-        try {
-            impl.verifyType();
-        } catch (e) {
-            throw `${e} in function ${this.name}`
-        }
+
+        impl.verifyType();
 
         this.patterns.push(pattern);
         this.implementations.push(impl);
@@ -328,6 +346,7 @@ class FunctionThunk {
     }
 
     bind(t1) {
+
         let name = `${this.name} ${t1}`;
         let nextFunction = new PartialFunctionThunk(name, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
@@ -386,6 +405,9 @@ class FunctionThunk {
         for (let i = 0; i < this.implementations.length; i++) {
             this.implementations[i].verifyType();
         }
+    }
+
+    annotateTypes(n) {
     }
 }
 

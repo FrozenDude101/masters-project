@@ -96,6 +96,13 @@ class ApplicationType extends Type {
         return new ApplicationType(this.t1.substituteConstraint(s, t), this.t2.substituteConstraint(s, t));
     }
 
+    annotateTypes(n) {
+        let t = this.clone();
+        t.t1 = t.t1.annotateTypes(n);
+        t.t2 = t.t2.annotateTypes(n);
+        return t;
+    }
+
 }
 
 class LiteralType extends Type {
@@ -145,6 +152,10 @@ class LiteralType extends Type {
     substituteConstraint(s, t) {
         return this.clone();
     }
+
+    annotateTypes(n) {
+        return this.clone();
+    }
 }
 
 class UnboundType extends Type {
@@ -153,14 +164,14 @@ class UnboundType extends Type {
 
     constructor(symbol, cs=null) {
         super();
-        this.symbol = symbol;
+        this.symbol = symbol + "_u";
         this.cs = cs;
     }
     clone() {
         return new UnboundType(this.symbol);
     }
     toString() {
-        return `${this.symbol}`;
+        return `${this.symbol.split("_")[0]}`;
     }
 
     equals(t2) {
@@ -196,6 +207,15 @@ class UnboundType extends Type {
     }
     substituteConstraint(s, t) {
         return this.symbol === s ? t.clone() : this.clone();
+    }
+
+    annotateTypes(n) {
+        let t = this.clone();
+        let ts = t.symbol.split("_");
+        ts.pop();
+        ts.push(n);
+        t.symbol = ts.join("_");
+        return t;
     }
 
 }
@@ -268,6 +288,13 @@ class FunctionType extends Type {
         return rt2;
     }
 
+    annotateTypes(n) {
+        let t = this.clone();
+        t.t1 = t.t1.annotateTypes(n);
+        t.t2 = t.t2.annotateTypes(n);
+        return t;
+    }
+
 }
 
 let a = new UnboundType("a");
@@ -282,3 +309,4 @@ let maybe_int = new ApplicationType(maybe, int);
 let a_a = new FunctionType(a, a);
 let a_b = new FunctionType(a, b);
 let a_b_a_b = new FunctionType(a, new FunctionType(b, new FunctionType(a, b)));
+let a_b__a_b = new FunctionType(new FunctionType(a, b), new FunctionType(a, b));

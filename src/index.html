@@ -51,11 +51,15 @@
 foo :: (a -> b) -> a -> b
 foo f a = f a
 
-bar :: a0 -> b0
+bar :: a -> a
 bar a = a
 
 baz :: Integer
 baz = foo bar 2
+
+multiply :: Integer -> Integer -> Integer
+multiply a 0 = 0
+multiply a b = a + multiply a (pred b)                    
 </textarea>
             </div>
             <div id="scrollable-container">
