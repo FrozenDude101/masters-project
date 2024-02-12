@@ -164,7 +164,10 @@ class UnboundType extends Type {
 
     constructor(symbol, cs=null) {
         super();
-        this.symbol = symbol + "_u";
+        this.symbol = symbol;
+        if (this.symbol.split("_").length === 1) {
+            this.symbol += "_u";
+        }
         this.cs = cs;
     }
     clone() {
