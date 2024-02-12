@@ -74,10 +74,11 @@ class ApplicationType extends Type {
         return new ApplicationType(this.t1.alphaConvert(rs), this.t2.alphaConvert(rs));
     }
 
-    canMatch(t3) {
+    canMatch(t3, strict=null) {
+        if (strict === null) strict = this.getSymbols();
         switch (t3.typeType) {
             case Type.APPLICATION:
-                return this.t1.canMatch(t3.t1) && this.t2.canMatch(t3.t2);
+                return this.t1.canMatch(t3.t1, strict) && this.t2.canMatch(t3.t2, strict);
             case Type.LITERAL:
                 return false;
             case Type.FUNCTION:
@@ -123,7 +124,8 @@ class LiteralType extends Type {
         return this.clone();
     }
 
-    canMatch(t2) {
+    canMatch(t2, strict=null) {
+        if (strict === null) strict = this.getSymbols();
         switch (t2.typeType) {
             case Type.APPLICATION:
                 return false;
@@ -174,7 +176,8 @@ class UnboundType extends Type {
         return this.clone();
     }
 
-    canMatch(t2) {
+    canMatch(t2, strict=null) {
+        if (strict === null) strict = this.getSymbols();
         switch (t2.typeType) {
             case Type.APPLICATION:
                 return this.cs === null;
@@ -183,6 +186,8 @@ class UnboundType extends Type {
             case Type.FUNCTION:
                 return this.cs === null;
             case Type.UNBOUND:
+                if (strict.includes(t2.symbol))
+                    return t2.symbol === this.symbol;
                 return this.cs === null;
         }
     }
@@ -224,14 +229,15 @@ class FunctionType extends Type {
         return new FunctionType(this.t1.alphaConvert(rs), this.t2.alphaConvert(rs));
     }
 
-    canMatch(t3) {
+    canMatch(t3, strict=null) {
+        if (strict === null) strict = this.getSymbols();
         switch (t3.typeType) {
             case Type.APPLICATION:
                 return false;
             case Type.LITERAL:
                 return false;
             case Type.FUNCTION:
-                return this.t1.canMatch(t3.t1) && this.t2.canMatch(t3.t2);
+                return this.t1.canMatch(t3.t1, strict) && this.t2.canMatch(t3.t2, strict);
             case Type.UNBOUND:
                 return false;
         }
@@ -246,10 +252,12 @@ class FunctionType extends Type {
     }
 
     bind(t3) {
-        if (!this.t1.canMatch(t3))
+        let strict = this.getSymbols();
+
+        if (!this.t1.canMatch(t3, strict))
             throw `Cannot bind ${t3} to ${this}`
 
-        let cs = this.t1.getConstraints(t3);
+        let cs = this.t1.getConstraints(t3, strict);
         let ucs = this.unifyConstraints(cs);
 
         let rt2 = this.t2.clone();
