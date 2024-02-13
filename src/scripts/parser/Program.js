@@ -57,18 +57,23 @@ class Program {
     }
 
     convertToThunks() {
+        clearErrors();
         for (let f in this.functions) {
-            let thunk = new FunctionThunk(f, this.functions[f].type.toType());
-            Program.register(f, thunk);
-            let data = this.functions[f];
-            for (let i = 0; i < data.patterns.length; i++) {
-                let patt = data.patterns[i];
-                patt = new Pattern(...patt.map(p => p.toArgument()));
-
-                let impl = data.implementations[i];
-                impl = impl.toThunk();
-
-                thunk.setCase(patt, impl);
+            try {
+                let thunk = new FunctionThunk(f, this.functions[f].type.toType());
+                Program.register(f, thunk);
+                let data = this.functions[f];
+                for (let i = 0; i < data.patterns.length; i++) {
+                    let patt = data.patterns[i];
+                    patt = new Pattern(...patt.map(p => p.toArgument()));
+    
+                    let impl = data.implementations[i];
+                    impl = impl.toThunk();
+    
+                    thunk.setCase(patt, impl);
+                }
+            } catch (e) {
+                addError(`${e} in function ${f}`);
             }
         }
     }

@@ -109,7 +109,7 @@ mark {
     align-items: stretch;
     gap: 5px;
 }
-.container-column:hover > .container {
+.container-column:hover > .container-row > .container {
     background-color: #555;
 } 
 .container-row {
@@ -143,23 +143,59 @@ mark {
     padding: 5px;
     background-color: #666;
     border-radius: 5px;
+    font-weight: bold;
 }
 
 .application {
     border-radius: 2px;
-    padding: 2px 5px;
+    padding: 2px;
+    margin: 0px 2px;
 }
 .application .application.hover,
 .application.hover {
     background-color: #c7522a;
     color: black;
 }
-.application:has(> .application.hover) {
+.application:has( .application.hover) {
     background-color: #e5c185;
 }
-.application:has(> .application > .application.hover) {
+.application:has(.application .application.hover) {
     background-color: #74a892;
 }
-.application:has(> .application > .application > .application.hover) {
+.application:has(.application .application .application.hover) {
     background-color: #008585;
+}
+
+.container-column.type {
+    flex-grow: 0.25;
+}
+.container-column:hover > .container.type {
+    background-color: beige;
+    color: black;
+} 
+.container.type {
+    background-color: tan;
+    color: black;
+}
+.container-title.type {
+    background-color: sandybrown;
+}
+
+.application .application.hover.type,
+.application.hover.type {
+    background-color: red;
+    color: black;
+}
+.application:has(> .application.hover.type) {
+    background-color: yellow;
+}
+.application:has(> .application > .application.hover.type) {
+    background-color: teal;
+}
+.application:has(> .application > .application > .application.hover.type) {
+    background-color: navy;
+}
+
+.title-button {
+    margin-left: 10px;
 }

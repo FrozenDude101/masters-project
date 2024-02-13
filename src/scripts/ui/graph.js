@@ -2,7 +2,7 @@ let cols = {
     "0": document.getElementById("cc0"),
 }
 let rows = {
-
+    "": document.getElementById("cr"),
 }
 let titles = {
 
@@ -14,6 +14,11 @@ let states = {
 
 }
 let marked = [];
+let typeCols = {
+
+}
+let typeTitles = {}
+let typeBodies = {}
 
 function displayState() {
     if (states["0"] === null) return;
@@ -54,6 +59,7 @@ function applicationClick(event, collection, id) {
 
     states[cID] = tW;
     titles[cID].innerHTML = ""+tW;
+    titles[cID].appendChild(createTypeButton(cID));
     displayState();
 }
 
@@ -77,8 +83,7 @@ function createCol(id) {
     col.id = `cc${id}${n}`;
     cols[`${id}${n}`] = col;
 
-    let container = createContainer(`${id}${n}`)
-
+    let container = createContainer(`${id}${n}`);
     col.appendChild(container);
     row.appendChild(col);
     return col;
@@ -104,7 +109,19 @@ function createContainer(id) {
     container.appendChild(title);
     container.appendChild(body);
 
-    return container;
+    let r = document.createElement("div");
+    r.classList.add("container-row");
+    r.appendChild(container);
+
+    return r;
+}
+function createTypeButton(id) {
+    let typeButton = document.createElement("button");
+    typeButton.classList.add("title-button");
+    typeButton.id = `tb${id}`;
+    typeButton.innerHTML = "T"
+    typeButton.onclick = (e) => typeClick(e, id);
+    return typeButton;
 }
 
 function addContainer(id) {
@@ -123,11 +140,19 @@ function removeContainer(id) {
     delete titles[`${id}`];
     delete bodies[`${id}`];
     delete states[`${id}`];
+    removeTypeContainer(id);
     if (row.children.length === 0) {
         let col2 = cols[id.slice(0, -1)];
         col2.removeChild(row);
         delete rows[`${id.slice(0, -1)}`]
     }
+}
+function removeTypeContainer(id) {
+    if (!typeCols[`${id}`]) return;
+    typeCols[`${id}`].remove();
+    delete typeCols[`${id}`];
+    delete typeTitles[`${id}`];
+    delete typeBodies[`${id}`];
 }
 
 function containerClick(id) {
@@ -142,4 +167,67 @@ function containerClick(id) {
     displayState();
 }
 
-cols["0"].appendChild(createContainer("0"));
+function createTypeCol(id) {
+    let col = document.createElement("div");
+    col.classList.add("container-column", "type");
+    col.id = `tc${id}`;
+    typeCols[`${id}`] = col;
+
+    let container = createTypeContainer(`${id}`)
+
+    col.appendChild(container);
+    return col;
+}
+function createTypeContainer(id) {
+    let c = document.createElement("div");
+    c.classList.add("container", "type");
+
+    let title = document.createElement("div");
+    title.classList.add("container-title", "type");
+    title.id = `ct${id}`;
+    typeTitles[`${id}`] = title;
+
+    let body = document.createElement("div");
+    body.classList.add("container-body", "type");
+    body.id = `cb${id}`;
+    typeBodies[`${id}`] = body;
+
+    let closeButton = document.createElement("button");
+    closeButton.classList.add("title-button");
+    closeButton.id = `cb${id}`;
+    closeButton.innerHTML = "X";
+    closeButton.onclick = () => removeTypeContainer(id);
+
+    title.innerHTML = states[`${id}`].type;
+    title.appendChild(closeButton);
+
+    if (states[`${id}`].t instanceof ApplicationThunk) {
+        let cs = states[`${id}`].t.t1.type.getUCS(states[`${id}`].t.t2.type);
+        let string = "<br>None";
+        if (Object.keys(cs).length !== 0) {
+            string = "";
+            for (let k in cs) {
+                string += `<br>${k.split("_").slice(0,-1).join("_")} = ${cs[k]}`
+            }
+        }
+        body.innerHTML = `${states[`${id}`].t.t2.type}<br>is applied to<br>${states[`${id}`].t.t1.type}<br>returning<br>${states[`${id}`].type}<br><br>Replacements${string}`;
+    } else {
+        body.innerHTML = `${states[`${id}`]}`
+    }
+
+    c.appendChild(title);
+    c.appendChild(body);
+
+    return c;
+}
+
+function typeClick(event, id) {
+    event.stopPropagation();
+    if (typeCols[id]) return;
+    let col = createTypeCol(id);
+    document.getElementById(`c${id}`).insertAdjacentElement("afterend", col);
+}
+
+let c = createContainer("0");
+cols["0"].appendChild(c);
+titles["0"].innerHTML = "Setup to begin.";

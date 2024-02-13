@@ -334,6 +334,8 @@ class FunctionThunk {
 
         impl.verifyType();
 
+        // TODO, verify return type matches.
+
         this.patterns.push(pattern);
         this.implementations.push(impl);
     }

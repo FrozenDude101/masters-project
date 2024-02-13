@@ -39,6 +39,7 @@ function setupState() {
     cols["0"].appendChild(container);
 
     titles["0"].innerHTML += ""+states["0"];
+    titles["0"].appendChild(createTypeButton("0"));
 }
 
 let history = [];

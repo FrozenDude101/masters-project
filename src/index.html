@@ -59,7 +59,10 @@ baz = foo bar 2
 
 multiply :: Integer -> Integer -> Integer
 multiply a 0 = 0
-multiply a b = a + multiply a (pred b)                    
+multiply a b = a + multiply a (pred b)
+
+bee :: Integer
+bee = multiply 5 5
 </textarea>
             </div>
             <div id="scrollable-container">
@@ -92,7 +95,9 @@ multiply a b = a + multiply a (pred b)
                 <button onclick="reset()">Reset</button>
             </div>
         </div>
-        <div class="container-column" id="cc0">
+        <div class="container-row" id="cr">
+            <div class="container-column" id="cc0">
+            </div>
         </div>
     </body>
 

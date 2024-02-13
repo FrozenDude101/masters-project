@@ -290,6 +290,17 @@ class FunctionType extends Type {
 
         return rt2;
     }
+    getUCS(t3) {
+        let strict = this.getSymbols();
+
+        if (!this.t1.canMatch(t3, strict))
+            throw `Cannot bind ${t3} to ${this}`
+
+        let cs = this.t1.getConstraints(t3, strict);
+        let ucs = this.unifyConstraints(cs);
+
+        return ucs;
+    }
 
     annotateTypes(n) {
         let t = this.clone();
