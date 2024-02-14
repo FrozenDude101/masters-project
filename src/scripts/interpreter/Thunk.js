@@ -334,7 +334,13 @@ class FunctionThunk {
 
         impl.verifyType();
 
-        // TODO, verify return type matches.
+        let returnType = this.type;
+        for (let i = 0; i < pattern.length(); i++) {
+            returnType = returnType.t2;
+        }
+        if (!returnType.equals(impl.type)) {
+            throw `Expected '${returnType}', but received '${impl.type}'`;
+        }
 
         this.patterns.push(pattern);
         this.implementations.push(impl);

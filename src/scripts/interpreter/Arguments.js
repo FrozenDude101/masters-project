@@ -2,6 +2,7 @@ class EArgument {
 
     static VARIABLE    = "variable";
     static LITERAL     = "literal";
+    static WILD        = "wild";
 
 }
 
@@ -110,4 +111,40 @@ class LiteralArgument {
     getReplacements() {
         return [];
     }
+}
+
+class WildcardArgument {
+
+    argumentType = EArgument.WILD;
+
+    clone() {
+        return new WildcardArgument();
+    }
+    toString() {
+        return `_`;
+    }
+
+    requiresSteps(t) {
+        return false;
+    }
+    matches(t,_) {
+        return true;
+    }
+    getSymbols() {
+        return [];
+    }
+
+    getConstraints(t1) {
+        return [];
+    }
+    applyTypeConstraints(cs) {
+        return;
+    }
+    applyType(t1) {
+    }
+
+    getReplacements() {
+        return [];
+    }
+
 }

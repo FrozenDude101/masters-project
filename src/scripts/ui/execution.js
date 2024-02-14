@@ -32,6 +32,16 @@ function setupState() {
     if (hasErrors())
         state = null;
 
+    cols = {"0": document.getElementById("cc0")}
+    rows = {"": document.getElementById("cr")}
+    titles = {}
+    bodies = {}
+    states = {}
+    marked = [];
+    typeCols = {}
+    typeTitles = {}
+    typeBodies = {}
+
     states["0"] = new ThunkWrapper(state);
 
     let container = createContainer("0");
@@ -45,7 +55,7 @@ function setupState() {
 let history = [];
 let executeInterval = null;
 function execute() {
-    if (states["0"] === null) {
+    if (!states["0"]) {
         setupState();
         displayState();
     }

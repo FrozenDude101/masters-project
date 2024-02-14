@@ -278,7 +278,7 @@ class FunctionType extends Type {
         let strict = this.getSymbols();
 
         if (!this.t1.canMatch(t3, strict))
-            throw `Cannot bind ${t3} to ${this}`
+            throw `Cannot bind '${t3}' to '${this}'`
 
         let cs = this.t1.getConstraints(t3, strict);
         let ucs = this.unifyConstraints(cs);

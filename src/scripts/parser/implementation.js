@@ -109,6 +109,8 @@ function parseImplementation(tokens, endChar = "\n") {
                 impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
                 break;
             case Token.VARID:
+                if (Array.from(t.value).every(c => c === "_"))
+                    throw "Invalid wildcard symbol in function body"
                 node = new ImplNode(ImplNode.VARID, t.value, []);
                 impl = impl === null ? node : new ImplNode(ImplNode.APP, null, [impl, node]);
                 break;

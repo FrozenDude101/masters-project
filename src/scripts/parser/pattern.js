@@ -6,6 +6,7 @@ class PatternNode {
     static STRING  = "string";
 
     static VAR = "var";
+    static WILD = "wild";
 
     constructor(type, value, children) {
 
@@ -36,6 +37,8 @@ class PatternNode {
                 return new LiteralArgument(this.value, new LiteralType("String"));
             case PatternNode.VAR:
                 return new UnboundArgument(this.value);
+            case PatternNode.WILD:
+                return new WildcardArgument();
         }
     }
 
@@ -50,7 +53,10 @@ function parsePattern(tokens) {
         let node;
         switch (t.type) {
             case Token.VARID:
-                node = new PatternNode(PatternNode.VAR, t.value, []);
+                if (Array.from(t.value).every(c => c === "_"))
+                    node = new PatternNode(PatternNode.WILD, null, []);
+                else
+                    node = new PatternNode(PatternNode.VAR, t.value, []);
                 terms.push(node);
                 break;
             case Token.INT_LITERAL:
