@@ -64,6 +64,8 @@ class ImplNode {
                     ),
                     this.children[1].toThunk(),
                 );
+            case ImplNode.CONID:
+                return Program.get(this.value);
             default:
                 throw "Womp Womp";
         }

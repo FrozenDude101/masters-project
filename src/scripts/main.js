@@ -7,13 +7,13 @@ let parseTimeout = null;
 codeInput.addEventListener("input", () => {
     clearTimeout(parseTimeout);
     parseTimeout = setTimeout(() => {
+        Program.reset();
         let input = LexerInput.fromInput(CODE_INPUT.value + "\n");
 
         let tokens = Lexer.lexer(t_program)(input)[0].tokens;
         tokens = tokens.filter((t) => (t.type !== Token.NONE && t.type !== Token.WHITESPACE) || t.value.includes("\n"));
         tokens = tokens.map((t) => t.value.includes("\n") ? new Token(Token.SPECIAL, "\n", t.index) : t);
 
-        console.table(tokens);
         let program = parse(tokens);
 
         functionSelector.innerHTML = `<option>${NO_SELECTION}</option>`;

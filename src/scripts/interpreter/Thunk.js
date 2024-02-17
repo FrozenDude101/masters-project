@@ -176,6 +176,49 @@ class UnboundThunk {
     }
 }
 
+class ConstructorThunk {
+
+    constructor(name, type) {
+        this.name = name;
+        this.type = type;
+    }
+    clone() {
+        return new ConstructorThunk(this.name, this.type);
+    }
+    toString(raw) {
+        return `${this.name}`;
+    }
+
+    annotate(c) {}
+
+    canStep() {
+        return false;
+    }
+    canBind() {
+        return false;
+    }
+
+    replaceUnboundThunks(rs) {
+        return this.clone();
+    }
+    applyTypeConstraints(cs) {
+        for (let c of cs) {
+            this.type = this.type.substituteConstraint(c[0], c[1]);
+        }
+        return this.clone();
+    }
+
+    getById(id) {
+        return;
+    }
+
+    verifyType() {
+    }
+
+    annotateTypes(n) {
+    }
+}
+
 class ApplicationThunk {
 
     get type() {
@@ -201,7 +244,7 @@ class ApplicationThunk {
     }
 
     canStep() {
-        return true;
+        return this.t1.canBind() || this.t1.canStep();
     }
     canBind() {
         return false;
@@ -323,7 +366,7 @@ class FunctionThunk {
         let patternLength = Math.max(...this.patterns.map(p => p.length()));
         if (patternLength !== -Infinity && pattern.length() !== patternLength)
             throw "All patterns must have any equal number of arguments.";
-
+        
         pattern.applyType(this.type);
         let constraints = pattern.getConstraints(this.type);
         let uc = new Type().unifyConstraints(constraints);
@@ -338,6 +381,7 @@ class FunctionThunk {
         for (let i = 0; i < pattern.length(); i++) {
             returnType = returnType.t2;
         }
+        
         if (!returnType.equals(impl.type)) {
             throw `Expected '${returnType}', but received '${impl.type}'`;
         }
@@ -359,7 +403,7 @@ class FunctionThunk {
         let nextFunction = new PartialFunctionThunk(name, this.type.bind(t1.type));
         for (let i = 0; i < this.patterns.length; i++) {
             let patt = this.patterns[i];
-
+            
             if (patt.requiresSteps(t1))
                 return new ApplicationThunk(this, t1.step(), true);
             
@@ -402,6 +446,9 @@ class FunctionThunk {
         return nextFunction;
     }
     applyTypeConstraints(cs) {
+        if (this.patterns.length === 1 && this.patterns[0].length() === 0) {
+            return this.implementations[0].applyTypeConstraints(cs);
+        }
         return this;
     }
 

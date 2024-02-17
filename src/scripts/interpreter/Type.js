@@ -60,7 +60,9 @@ class ApplicationType extends Type {
         return new ApplicationType(this.t1.clone(), this.t2.clone());
     }
     toString() {
-        return `{${this.t1} ${this.t2}}`;
+        if (this.t2 instanceof ApplicationType)
+            return `${this.t1} (${this.t2})`;
+        return `${this.t1} ${this.t2}`;
     }
 
     equals(t3) {
@@ -178,7 +180,7 @@ class UnboundType extends Type {
     }
 
     equals(t2) {
-        return this.typeType === t2.typeType && this.symbol === t2.symbol;
+        return this.typeType === t2.typeType && (this.symbol.split("_").slice(0,-1).join("_") === t2.symbol.split("_").slice(0,-1).join("_"));
     }
 
     getSymbols() {
@@ -209,6 +211,8 @@ class UnboundType extends Type {
         return [[this.symbol, t2]]
     }
     substituteConstraint(s, t) {
+        if (this.symbol.split("_").slice(-1)[0] === "u" && this.symbol.split("_").slice(0, -1).join("_") === s)
+            return t.clone();
         return this.symbol === s ? t.clone() : this.clone();
     }
 
@@ -310,17 +314,3 @@ class FunctionType extends Type {
     }
 
 }
-
-let a = new UnboundType("a");
-let b = new UnboundType("b");
-
-let int = new LiteralType("Integer");
-let str = new LiteralType("String");
-
-let maybe = new LiteralType("Maybe");
-let maybe_int = new ApplicationType(maybe, int);
-
-let a_a = new FunctionType(a, a);
-let a_b = new FunctionType(a, b);
-let a_b_a_b = new FunctionType(a, new FunctionType(b, new FunctionType(a, b)));
-let a_b__a_b = new FunctionType(new FunctionType(a, b), new FunctionType(a, b));

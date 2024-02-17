@@ -30,6 +30,7 @@
         <script src = "scripts/parser/types.js" defer></script>
         <script src = "scripts/parser/pattern.js" defer></script>
         <script src = "scripts/parser/implementation.js" defer></script>
+        <script src = "scripts/parser/customType.js" defer></script>
 
         <script src = "scripts/interpreter/Thunk.js" defer></script>
         <script src = "scripts/interpreter/Type.js" defer></script>
@@ -48,21 +49,15 @@
                     </div>
                 </div>
                 <textarea class="highlight-sync" id="code-input" rows=25 cols=50>
-foo :: (a -> b) -> a -> b
-foo f a = f a
+data Maybe a = Just a | Nothing
 
-bar :: a -> a
-bar a = a
+baz :: Maybe Integer -> Integer -> Integer
+baz Nothing  a = a
+baz (Just a) _ = a
 
-baz :: Integer
-baz = foo bar 2
-
-multiply :: Integer -> Integer -> Integer
-multiply a 0 = 0
-multiply a b = a + multiply a (pred b)
-
-bee :: Integer
-bee = multiply 5 5
+foo :: Integer -> Integer -> Maybe Integer
+foo a 0 = Nothing
+foo a b = Just (a + b)                    
 </textarea>
             </div>
             <div id="scrollable-container">

@@ -6,6 +6,7 @@ class PatternNode {
     static STRING  = "string";
 
     static VAR = "var";
+    static CON = "constructor";
     static WILD = "wild";
 
     constructor(type, value, children) {
@@ -39,6 +40,12 @@ class PatternNode {
                 return new UnboundArgument(this.value);
             case PatternNode.WILD:
                 return new WildcardArgument();
+            case PatternNode.CON:
+                let arg = new ConstructorArgument(this.value);
+                for (let c of this.children) {
+                    arg = new ApplicationArgument(arg, c.toArgument());
+                }
+                return arg;
         }
     }
 
@@ -57,6 +64,10 @@ function parsePattern(tokens) {
                     node = new PatternNode(PatternNode.WILD, null, []);
                 else
                     node = new PatternNode(PatternNode.VAR, t.value, []);
+                terms.push(node);
+                break;
+            case Token.CONID:
+                node = new PatternNode(PatternNode.CON, t.value, []);
                 terms.push(node);
                 break;
             case Token.INT_LITERAL:
@@ -83,8 +94,22 @@ function parsePattern(tokens) {
                 node = new PatternNode(PatternNode.STRING, t.value, []);
                 terms.push(node);
                 break;
+            case Token.SPECIAL:
+                switch (t.value) {
+                    case "(":
+                        t = tokens.shift();
+                        if (t.type === Token.CONID) {
+                            node = new PatternNode(PatternNode.CON, t.value, parsePattern(tokens));
+                            terms.push(node);
+                        }
+                        break;
+                    case ")":
+                        return terms;
+                }
+                break;
             case Token.OP:
-                if (t.value !== "=") throw new ParserError(`Unexpected operator '${t.value}' in pattern match.`, t.index, t.length);
+                if (t.value !== "=")
+                    throw new ParserError(`Unexpected operator '${t.value}' in pattern match.`, t.index, t.length);
                 return terms;
         }
     }

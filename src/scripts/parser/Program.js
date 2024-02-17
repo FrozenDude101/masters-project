@@ -1,14 +1,27 @@
 class Program {
 
-    static Prelude = {};
-    static register(name, thunk) {
-        this.Prelude[name] = thunk;
+    static modulePriority = ["main", "Prelude"];
+    static modules = {};
+
+    static register(name, thunk, module="main") {
+        if (!this.modules[module])
+            this.modules[module] = {};
+        this.modules[module][name] = thunk;
+    }
+    static Prelude(name, thunk) {
+        this.register(name, thunk, "Prelude");
     }
     static get(name) {
-        return this.Prelude[name];
+        for (let m of this.modulePriority) {
+            if (this.modules?.[m]?.[name])
+                return this.modules[m][name];
+        }
     }
     static contains(name) {
-        return name in this.Prelude;
+        return !!this.get(name);
+    }
+    static reset() {
+        this.modules["main"] = {};
     }
 
     functions = {};

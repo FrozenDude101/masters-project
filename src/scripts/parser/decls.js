@@ -2,7 +2,14 @@ function parseDeclarations(tokens) {
 
     let t0 = tokens.shift();
 
-    switch (t0.value) {
+    switch (t0.type) {
+        case Token.KEYWORD:
+            switch (t0.value) {
+                case "data":
+                    parseCustomType(tokens);
+                    break;
+            }
+            break;
         default:
             let t1 = tokens.shift();
             switch (t1.value) {

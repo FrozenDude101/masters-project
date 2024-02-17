@@ -36,7 +36,7 @@ class Pattern {
     }
 
     toString() {
-        return ""+this.args.reduce((a, v) => a+", "+v);
+        return this.length() === 0 ? "-" : ""+this.args.reduce((a, v) => a+", "+v);
     }
 
     getConstraints(t1) {
