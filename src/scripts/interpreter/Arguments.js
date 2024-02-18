@@ -10,8 +10,9 @@ class UnboundArgument {
 
     argumentType = EArgument.VARIABLE;
 
-    constructor(symbol) {
+    constructor(symbol, type=undefined) {
         this.symbol = symbol;
+        this.type = type ? type : new UnboundType(this.symbol);
     }
     clone() {
         return new UnboundArgument(this.symbol, this.type.clone());
@@ -43,6 +44,7 @@ class UnboundArgument {
         }
     }
     applyType(t1) {
+        if (t1 === undefined) return;
         this.type = t1;
     }
 
@@ -56,6 +58,7 @@ class ConstructorArgument {
 
     constructor(name) {
         this.name = name;
+        this.type = Program.get(this.name).type.clone();
     }
     clone() {
         return new ConstructorArgument(this.name);
@@ -76,6 +79,17 @@ class ConstructorArgument {
     }
     getSymbols() {
         return [];
+    }
+
+    getTypeToConstrain(n) {
+        let as = [];
+        let t = this.type.clone();
+        for (let i = 0; i < Program.get(this.name).patterns[0].length(); i++) {
+            as.push(t.t1);
+            t = t.t2;
+        }
+        as.reverse();
+        return as.slice(n)[0];
     }
 
     getConstraints(t1) {
@@ -122,8 +136,13 @@ class ApplicationArgument {
         return this.a1.getSymbols().concat(this.a2.getSymbols());
     }
 
+    getTypeToConstrain(n=0) {
+        return this.a1.getTypeToConstrain(n-1);
+    }
+
     getConstraints(t1) {
-        return this.a1.getConstraints(t1.t1).concat(this.a2.getConstraints(t1.t2));
+        let tc = this.getTypeToConstrain();
+        return this.a1.getConstraints().concat(this.a2.getConstraints(tc));
     }
     applyTypeConstraints(cs) {
         this.a1.applyTypeConstraints(cs);

@@ -28,26 +28,47 @@ function parseCustomType(tokens) {
             throw "Expected constructor ID after '=' or '|'."
 
         let cName = t.value;
-        let cType = returnType.clone();
+        let cTypes = [];
         let cFunc = new ConstructorThunk(cName, returnType);
         let cPattern = new Pattern();
 
         t = tokens.shift();
-        while (t.type === Token.VARID || t.type === Token.CONID) {
+        while (t.type === Token.VARID || t.type === Token.CONID || (t.type === Token.SPECIAL && t.value !== "\n")) {
             if (t.type === Token.VARID) {
                 cFunc = new ApplicationThunk(cFunc, new UnboundThunk(t.value));
-                cType = new FunctionType(new UnboundType(t.value), cType);
+                cTypes.push(new UnboundType(t.value));
                 cPattern.args.push(new UnboundArgument(t.value));
             } else if (t.type === Token.CONID) {
                 let symbol = "a";
                 while (usedSymbols.includes(symbol)) {
                     symbol = String.fromCharCode("a".charCodeAt()+1)
                 }
+                usedSymbols.push(symbol);
+
                 cFunc = new ApplicationThunk(cFunc, new UnboundThunk(symbol, new LiteralType(t.value)));
-                cType = new FunctionType(new LiteralType(t.value), cType);
+                cTypes.push(new LiteralType(t.value));
+                cPattern.args.push(new UnboundArgument(symbol));
+            } else if (t.type === Token.SPECIAL) {
+                if (t.value !== "(")
+                    throw `Expected '(', but received '${t.value}'.`;
+                let cType2 = parseCustomTypeInCustomType(tokens);
+
+                let symbol = "a";
+                while (usedSymbols.includes(symbol)) {
+                    symbol = String.fromCharCode("a".charCodeAt()+1)
+                }
+                usedSymbols.push(symbol);
+
+                cFunc = new ApplicationThunk(cFunc, new UnboundThunk(symbol, cType2.clone()));
+                cTypes.push(cType2.clone());
                 cPattern.args.push(new UnboundArgument(symbol));
             }
             t = tokens.shift();
+        }
+
+        let cType = returnType.clone();
+        while (cTypes.length) {
+            cType = new FunctionType(cTypes.pop().clone(), cType.clone());
         }
 
         let thunk = cFunc;
@@ -64,4 +85,28 @@ function parseCustomType(tokens) {
             break;            
 
     } while (true)
+}
+
+function parseCustomTypeInCustomType(tokens) {
+    t = tokens.shift();
+    if (t.type !== Token.CONID)
+        throw "Expected constructor ID after '=' or '|'."
+
+    let cType = new LiteralType(t.value);
+
+    t = tokens.shift();
+    while (t.type === Token.VARID || t.type === Token.CONID || (t.type === Token.SPECIAL && t.value !== ")")) {
+        if (t.type === Token.VARID) {
+            cType = new ApplicationType(cType, new UnboundType(t.value));
+        } else if (t.type === Token.CONID) {
+            cType = new ApplicationType(cType, new LiteralType(t.value));
+        } else if (t.type === Token.SPECIAL) {
+            if (t.value !== "(")
+                throw `Expected '(', but received '${t.value}'.`;
+            let cType2 = parseCustomTypeInCustomType(tokens);
+            cType = new ApplicationType(cType, cType2);
+        }
+        t = tokens.shift();
+    }
+    return cType;
 }

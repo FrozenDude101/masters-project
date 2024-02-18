@@ -49,16 +49,11 @@
                     </div>
                 </div>
                 <textarea class="highlight-sync" id="code-input" rows=25 cols=50>
-data Maybe a = Just a | Nothing
+data List a = Nil | Cons a (List a)
 
-baz :: Maybe Integer -> Integer -> Integer
-baz Nothing  a = a
-baz (Just a) _ = a
-
-foo :: Integer -> Integer -> Maybe Integer
-foo a 0 = Nothing
-foo a b = Just (a + b)                    
-</textarea>
+foo :: List a -> a -> a
+foo (Cons x xs) a = x
+foo Nil a         = a</textarea>
             </div>
             <div id="scrollable-container">
                 <div id="error-container"></div>

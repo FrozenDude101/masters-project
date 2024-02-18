@@ -204,6 +204,8 @@ class UnboundType extends Type {
             case Type.UNBOUND:
                 if (strict.includes(t2.symbol))
                     return t2.symbol === this.symbol;
+                if (this.symbol.split("_").slice(0,-1).join("_") === t2.symbol.split("_").slice(0,-1).join("_"))
+                    return true
                 return this.cs === null;
         }
     }
