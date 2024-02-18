@@ -367,24 +367,39 @@ class FunctionThunk {
         if (patternLength !== -Infinity && pattern.length() !== patternLength)
             throw "All patterns must have any equal number of arguments.";
         
+        if (this.name === "foo") console.log("A");
         pattern.applyType(this.type);
+        if (this.name === "foo") console.log("B");
         let constraints = pattern.getConstraints(this.type);
+        if (this.name === "foo") console.log("C");
         let uc = new Type().unifyConstraints(constraints);
+        if (this.name === "foo") console.log("D");
         pattern.applyTypeConstraints(uc);
+        if (this.name === "foo") console.log("E");
 
         let rs = pattern.getReplacements();
+        if (this.name === "foo") console.log("F");
         impl = new ThunkWrapper(impl.applyTypeConstraints(rs));
+        if (this.name === "foo") console.log("G");
 
         impl.verifyType();
+        if (this.name === "foo") console.log("H");
 
         let returnType = this.type;
         for (let i = 0; i < pattern.length(); i++) {
             returnType = returnType.t2;
         }
+        if (this.name === "foo") console.log("I");
         
         if (!returnType.equals(impl.type)) {
-            throw `Expected '${returnType}', but received '${impl.type}'`;
+            if (!impl.type.canMatch(returnType))
+                throw `Expected '${returnType}', but received '${impl.type}'`;
+            let cs = impl.type.getConstraints(returnType);
+            impl.applyTypeConstraints(cs);
+            if (!returnType.equals(impl.type))
+                throw `Expected '${returnType}', but received '${impl.type}'`;
         }
+        if (this.name === "foo") console.log("J");
 
         this.patterns.push(pattern);
         this.implementations.push(impl);
