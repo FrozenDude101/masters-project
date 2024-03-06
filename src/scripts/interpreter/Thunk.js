@@ -91,7 +91,7 @@ class LiteralThunk {
 
     constructor(value, type) {
         this.value = value;
-        this.type = type;
+        this.type = type.clone();
     }
     clone() {
         return new LiteralThunk(this.value, this.type.clone());
@@ -132,7 +132,7 @@ class UnboundThunk {
 
     constructor(symbol, type = undefined) {
         this.symbol = symbol;
-        this.type = type === undefined ? new UnboundType(`${symbol}_unknown`) : type;
+        this.type = type === undefined ? new UnboundType(`${symbol}_unknown`) : type.clone();
     }
     clone() {
         return new UnboundThunk(this.symbol, this.type.clone());
@@ -180,10 +180,10 @@ class ConstructorThunk {
 
     constructor(name, type) {
         this.name = name;
-        this.type = type;
+        this.type = type.clone();
     }
     clone() {
-        return new ConstructorThunk(this.name, this.type);
+        return new ConstructorThunk(this.name, this.type.clone());
     }
     toString(raw) {
         return `${this.name}`;
@@ -289,7 +289,7 @@ class JSThunk {
     constructor(name, func, type) {
         this.name = name;
         this.func = func;
-        this.type = type;
+        this.type = type.clone();
     }
     clone() {
         return new JSThunk(this.name, this.func, this.type);
@@ -350,7 +350,7 @@ class FunctionThunk {
         this.patterns        = []
         this.implementations = []
 
-        this.type = this.type.annotateTypes(this.name);
+        this.type = this.type.annotateTypes(this.name).clone();
     }
     clone() {
         return this;
@@ -371,14 +371,14 @@ class FunctionThunk {
         pattern.applyType(this.type);
         if (this.name === "foo") console.log("B");
         let constraints = pattern.getConstraints(this.type);
-        if (this.name === "foo") console.log("C");
+        if (this.name === "foo") console.log("C: ", constraints);
         let uc = new Type().unifyConstraints(constraints);
         if (this.name === "foo") console.log("D");
         pattern.applyTypeConstraints(uc);
         if (this.name === "foo") console.log("E");
 
         let rs = pattern.getReplacements();
-        if (this.name === "foo") console.log("F");
+        if (this.name === "foo") console.log("F:", rs);
         impl = new ThunkWrapper(impl.applyTypeConstraints(rs));
         if (this.name === "foo") console.log("G");
 

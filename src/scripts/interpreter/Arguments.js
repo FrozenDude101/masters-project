@@ -12,7 +12,7 @@ class UnboundArgument {
 
     constructor(symbol, type=undefined) {
         this.symbol = symbol;
-        this.type = type ? type : new UnboundType(this.symbol);
+        this.type = type ? type.clone() : new UnboundType(this.symbol);
     }
     clone() {
         return new UnboundArgument(this.symbol, this.type.clone());
@@ -42,8 +42,16 @@ class UnboundArgument {
         if (this.symbol in cs) {
             this.type = cs[this.symbol];
         }
+        if (this.type.symbol in cs) {
+            this.type = cs[this.type.symbol];
+        }
+        for (let k in cs) {
+            this.type.substituteConstraint(k, cs[k]);
+        }
     }
     applyType(t1) {
+        if (this.symbol === "xs")
+            console.log("XS "+t1);
         if (t1 === undefined) return;
         this.type = t1;
     }
@@ -91,6 +99,16 @@ class ConstructorArgument {
         as.reverse();
         return as.slice(n)[0];
     }
+    getConRetType() {
+        let t = this.type.clone();
+        for (let i = 0; i < Program.get(this.name).patterns[0].length(); i++) {
+            t = t.t2;
+        }
+        return t;
+    }
+    getCon() {
+        return Program.get(this.name);
+    }
 
     getConstraints(t1) {
         return [];
@@ -99,6 +117,8 @@ class ConstructorArgument {
         return;
     }
     applyType(t1) {
+    }
+    applyType2(t1) {
     }
 
     getReplacements() {
@@ -139,18 +159,37 @@ class ApplicationArgument {
     getTypeToConstrain(n=0) {
         return this.a1.getTypeToConstrain(n-1);
     }
+    getConRetType() {
+        return this.a1.getConRetType();
+    }
+    getCon() {
+        return this.a1.getCon();
+    }
 
     getConstraints(t1) {
-        let tc = this.getTypeToConstrain();
-        return this.a1.getConstraints().concat(this.a2.getConstraints(tc));
+        return [];
     }
     applyTypeConstraints(cs) {
         this.a1.applyTypeConstraints(cs);
         this.a2.applyTypeConstraints(cs);
     }
     applyType(t1) {
-        this.a1.applyType(t1.t1);
-        this.a2.applyType(t1.t2);
+        let crt = this.getConRetType();
+        console.log(""+t1);
+        console.log(""+crt);
+        console.log(t1.unifyConstraints(crt.getConstraints(t1)));
+
+        let con = this.getCon();
+        let patt = con.patterns[0].clone();
+        patt.applyTypeConstraints(
+            t1.unifyConstraints(crt.getConstraints(t1))
+        );
+
+        this.applyType2(patt.args.map(a => a.type).reverse());
+    }
+    applyType2(ts) {
+        this.a1.applyType2(ts.slice(1));
+        this.a2.applyType(ts[0]);
     }
 
     getReplacements() {

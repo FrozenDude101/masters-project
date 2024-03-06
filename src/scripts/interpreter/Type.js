@@ -86,7 +86,7 @@ class ApplicationType extends Type {
             case Type.FUNCTION:
                 return false;
             case Type.UNBOUND:
-                return false;
+                return t2.symbol.endsWith("_u");
         }
     }
     getConstraints(t3) {
@@ -143,7 +143,7 @@ class LiteralType extends Type {
             case Type.FUNCTION:
                 return false;
             case Type.UNBOUND:
-                return false;
+                return t2.symbol.endsWith("_u");
         }
     }
     getConstraints(t2) {
@@ -268,7 +268,7 @@ class FunctionType extends Type {
             case Type.FUNCTION:
                 return this.t1.canMatch(t3.t1, strict) && this.t2.canMatch(t3.t2, strict);
             case Type.UNBOUND:
-                return false;
+                return t2.symbol.endsWith("_u");
         }
     }
     getConstraints(t3) {

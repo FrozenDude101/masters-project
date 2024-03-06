@@ -1,0 +1,217 @@
+* {
+    font-family: monospace;
+}
+.literal-span {
+    white-space: pre;
+}
+.title {
+    color: white;
+}
+
+#body {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+
+    margin: 5px;
+    width: calc(100vw - 10px);
+    height: calc(100vh - 10px);
+
+    background-color: #222;
+}
+
+#input-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+}
+
+#code-input, #stdout {
+    margin: 0;          /* Firefox fix */
+    border-radius: 0;   /* iOS fix */
+
+    background-color: transparent;
+
+    resize: none;
+    overflow-y: scroll;
+
+    color: white;
+
+    font-family: monospace;
+    font-size: medium;
+}
+.highlight-sync {
+    font-family: monospace;
+    font-size: medium;
+}
+#highlights {
+    position: absolute;
+    margin: 3px -3px 3px 3px;
+    overflow: hidden;
+    pointer-events: none;
+
+    color: transparent;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+mark {
+    color: transparent;
+    background-color: red;
+    opacity: 0.5;
+}
+
+#scrollable-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-self: stretch;
+    overflow: hidden auto;
+    flex-grow: 1;
+    gap: 5px;
+}
+
+#error-container {
+    align-self: stretch;
+}
+.error-message {
+    color: white;
+}
+
+#function-selector {
+    align-self: flex-start;
+}
+
+#argument-container {
+    align-self: stretch;
+}
+#argument-title {
+    color: white;
+}
+.argument {
+    display: flex;
+    flex-flow: row;
+    gap: 5px;
+    margin: 5px 0px;
+}
+.argument-input {
+    flex-grow: 1;
+    margin-right: 5px;
+}
+
+.sc-row {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-items: center;
+    gap: 5px;
+}
+.sc-row input {
+    flex-grow: 1;
+}
+
+.container-column {
+    flex-grow: 1;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+}
+.container-column:hover > .container-row > .container {
+    background-color: #555;
+} 
+.container-row {
+    flex-grow: 1;
+
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 5px;
+}
+.container {
+    flex-grow: 1;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    background-color: #444;
+    font-family: monospace;
+    color: white;
+    font-size: large;
+    text-align: center;
+    user-select: none;
+
+    border-radius: 5px;
+    transition-duration: 100ms;
+}
+.container-title {
+    margin: 5px;
+    padding: 5px;
+    background-color: #666;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.application {
+    border-radius: 2px;
+    padding: 2px;
+    margin: 0px 2px;
+}
+.application .application.hover,
+.application.hover {
+    background-color: #c7522a;
+    color: black;
+}
+.application:has( .application.hover) {
+    background-color: #e5c185;
+}
+.application:has(.application .application.hover) {
+    background-color: #74a892;
+}
+.application:has(.application .application .application.hover) {
+    background-color: #008585;
+}
+
+.container-column.type {
+    flex-grow: 0.25;
+}
+.container-column:hover > .container.type {
+    background-color: beige;
+    color: black;
+} 
+.container.type {
+    background-color: tan;
+    color: black;
+}
+.container-title.type {
+    background-color: sandybrown;
+}
+
+.application .application.hover.type,
+.application.hover.type {
+    background-color: red;
+    color: black;
+}
+.application:has(> .application.hover.type) {
+    background-color: yellow;
+}
+.application:has(> .application > .application.hover.type) {
+    background-color: teal;
+}
+.application:has(> .application > .application > .application.hover.type) {
+    background-color: navy;
+}
+
+.title-button {
+    margin-left: 10px;
+}
