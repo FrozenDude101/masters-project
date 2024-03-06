@@ -108,7 +108,7 @@ class Program {
         let m = this._getModule(module);
         let tc = this._getTypeclassData(typeclass);
 
-        if (tc.instances.includes(tName))
+        if (t.classes.includes(typeclass))
             throw new DuplicateInstanceDefinitionError(module, `${typeclass} (${type})`);
         tc.instances.push(tName);
         t.classes.push(typeclass);

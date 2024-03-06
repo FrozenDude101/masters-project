@@ -226,7 +226,7 @@ function createTypeContainer(id) {
     closeButton.innerHTML = "X";
     closeButton.onclick = () => removeTypeContainer(id);
 
-    title.innerHTML = states[`${id}`].type;
+    title.innerHTML = typeToString(states[`${id}`].type);
     title.appendChild(closeButton);
 
     if (states[`${id}`].t instanceof ApplicationThunk) {
