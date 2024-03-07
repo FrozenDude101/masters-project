@@ -1,8 +1,10 @@
 const MAIN_TYPE = document.getElementById("main-type");
 const MAIN_INPUT = document.getElementById("main-input");
 
-MAIN_INPUT.oninput = ((e) => {
-    clearErrors();
+MAIN_INPUT.oninput = ((e) => parseMainInput(true));
+
+parseMainInput = (clear) => {
+    if (clear) clearErrors();   
     STDOUT.value = "";
     MAIN_TYPE.value = "";
     RETURN_VALUE.value = "";
@@ -34,4 +36,4 @@ MAIN_INPUT.oninput = ((e) => {
         console.warn(e);
         addError(e);
     }
-});
+};

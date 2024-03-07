@@ -6,7 +6,7 @@ CODE_INPUT.addEventListener("input", () => {
     parseTimeout = setTimeout(() => {
         let text = CODE_INPUT.value;
         Parser.main(text);
-        MAIN_INPUT.dispatchEvent(new InputEvent("input"));
+        parseMainInput(false);
     }, 1000);
 });
 

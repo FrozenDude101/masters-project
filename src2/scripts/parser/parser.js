@@ -6,45 +6,51 @@ class Parser {
 
     static main(s) {
         Program.resetMain();
+        clearErrors();
         this.parse("main", s);
     }
 
     static parse(module, ss) {
-        for (let s of ss.split("\n\n")) {
-            let tokens = Lexer.lex(s);
+        try {
+            for (let s of ss.split("\n\n")) {
+                let tokens = Lexer.lex(s);
 
-            while (tokens.length) {
-                let t = tokens[0];
-    
-                switch (t.type) {
-                    case Token.KEYWORD:
-                        switch (t.value) {
-                            case "class":
-                                this.parseTypeclass(module, tokens);
-                                break;
-                            case "instance":
-                                this.parseClassInstance(module, tokens);
-                                break;
-                            case "data":
-                                this.parseDataType(module, tokens);
-                                break;
-                            default:
-                                throw new UnexpectedTokenError(t, "declaration");
-                        }
-                        break;
-                    case Token.VARID:
-                        this.parseFunction(module, tokens);
-                        break;
-                    case Token.SPECIAL:
-                        if (t.value === "(")
+                while (tokens.length) {
+                    let t = tokens[0];
+        
+                    switch (t.type) {
+                        case Token.KEYWORD:
+                            switch (t.value) {
+                                case "class":
+                                    this.parseTypeclass(module, tokens);
+                                    break;
+                                case "instance":
+                                    this.parseClassInstance(module, tokens);
+                                    break;
+                                case "data":
+                                    this.parseDataType(module, tokens);
+                                    break;
+                                default:
+                                    throw new UnexpectedTokenError(t, "declaration");
+                            }
+                            break;
+                        case Token.VARID:
                             this.parseFunction(module, tokens);
-                        else
+                            break;
+                        case Token.SPECIAL:
+                            if (t.value === "(")
+                                this.parseFunction(module, tokens);
+                            else
+                                tokens.shift();
+                            break;
+                        default:
                             tokens.shift();
-                        break;
-                    default:
-                        tokens.shift();
+                    }
                 }
             }
+        } catch (e) {
+            addError(e);
+            console.warn(e);
         }
     }
 
