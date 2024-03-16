@@ -153,6 +153,12 @@ class ApplicationThunk {
         return new ApplicationThunk(this.t1.clone(), this.t2.clone(), this.rid);
     }
     toString() {
+
+        // TODO
+        //  t1   t2  
+        // (t1)  t2  t1 is 
+        //  t1  (t2) t2 is app / function
+        // (t1) (t2) 
         if (this.t1.t1 instanceof FunctionReferenceThunk || this.t1.t1 instanceof FunctionThunk || this.t1.t1 instanceof ConstructorThunk) {
             if (this.t1.t1.name.startsWith("(") && this.t1.t1.name.endsWith(")")) {
                 let h1 = `${this.t1.t2}`;
@@ -276,8 +282,22 @@ class FunctionThunk {
     step(t) {
         if (this.patterns[0].length === 0)
             return new ApplicationThunk(this.implementations[0].clone(), t);
+
+        let nextName = "This should never be seen.";
+        let n = this.name.replace(/[\(\)]/g, "").split(" ");
+        if (Program.isFunction(`(${n.slice(-1)})`)) {
+            if (n.length === 1)
+                nextName = `(${t} ${n.slice(-1)})`;
+            else
+                nextName = `${n.join(" ")} ${t}`;
+        } else {
+            if (!(t instanceof LiteralThunk || t instanceof UnboundThunk || t instanceof ConstructorThunk || (t instanceof FunctionThunk && t.name.split(" ").length === 1)))
+                nextName = `${n} (${t})`;
+            else
+                nextName = `${n} ${t}`;
+        }
         let nextType = this.type.bind(t.type);
-        let next = new FunctionThunk(`${this.name} ${t}`, nextType);
+        let next = new FunctionThunk(nextName, nextType);
 
         for (let i = 0; i < this.patterns.length; i++) {
             let pattern = this.patterns[i];
@@ -374,6 +394,8 @@ class FunctionReferenceThunk {
 
         for (let a of this.storedArgs)
             f = new ApplicationThunk(f, a);
+        for (let a of this.storedArgs)
+            f = f.step();
         return f;
     }
 
