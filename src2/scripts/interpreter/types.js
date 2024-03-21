@@ -451,14 +451,25 @@ function preAlphaConvert2(s1, s2) {
     return trs;
 }
 
-function typeToString(t) {
+function getFinalVarName(t, varName="a") {
+    let allVariables = t.getAllVariables();
+    allVariables = allVariables.reduce((a, v) => a.includes(v) ? a : a.concat([v]), []);
+
+    let varNameMap = {};
+    for (let v of allVariables) {
+        varNameMap[v] = varName;
+        varName = String.fromCodePoint(varName.codePointAt() + 1);
+    }
+
+    return varName;
+}
+function typeToString(t, varName="a") {
     let classConstraints = t.getClassConstraints({});
     Object.keys(classConstraints).map(k => classConstraints[k] = classConstraints[k].reduce((a, v) => a.includes(v) ? a : a.concat([v]), []));
     let allVariables = t.getAllVariables();
     allVariables = allVariables.reduce((a, v) => a.includes(v) ? a : a.concat([v]), []);
 
     let varNameMap = {};
-    let varName = "a";
     for (let v of allVariables) {
         varNameMap[v] = varName;
         varName = String.fromCodePoint(varName.codePointAt() + 1);
@@ -500,16 +511,16 @@ function typeToString(t) {
 
 class TypeBindError extends Error {
     constructor(t1, t2) {
-        super(`Can't bind ${t2} to ${t1}.`)
+        super(`Can't bind ${typeToString(t2)} to ${typeToString(t1, getFinalVarName(t2))}.`)
     }
 }
 class TypeEqualError extends Error {
     constructor(t1, t2) {
-        super(`Incompatible types ${t1} and ${t2}.`)
+        super(`Incompatible types ${typeToString(t1)} and ${typeToString(t2, getFinalVarName(t1))}.`)
     }
 }
 class TypeMatchError extends Error {
     constructor(t1, t2) {
-        super(`'${t2}' cannot match '${t1}'.`)
+        super(`'${typeToString(t2)}' cannot match '${typeToString(t1, getFinalVarName(t2))}'.`)
     }
 }

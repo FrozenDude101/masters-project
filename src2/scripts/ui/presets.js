@@ -13,6 +13,12 @@ const PRESETS = {
         ],
         main: "helloWorld",
     },
+    echo: {
+        name: "Hello, World!",
+        body: [
+        ],
+        main: "getLine >>= print",
+    },
     datatypes: {
         name: "Data Types",
         body: [
@@ -55,9 +61,34 @@ const PRESETS = {
         ],
         main: "zip2 (1:(2:(3:[]))) ('a':('b':('c':[])))",
     },
-    debug: {
+    monads: {
+        name: "Functors",
+        body: [
+            "-- class Functor f where",
+            "-- fmap :: (a -> b) -> f a -> f b",
+            "",
+            "-- instance Functor (Maybe a) where",
+            "-- fmap f Nothing  = Nothing",
+            "-- fmap f (Just a) = Just (f a)",
+            "",
+            "-- The Functor typeclass describes how values can be transformed.",
+            "-- For Maybe, if it doesn't have a value, it remains as Nothing.",
+            "-- If it has a value (Just a), it can be transformed (Just (f a)).",
+            "",
+            "f1 :: List Integer",
+            "f1 = 0:(1:(10:[]))",
+            "f2 :: Maybe Integer",
+            "f2 = Just 4",
+            "f3 :: Maybe Integer",
+            "f3 = Nothing",
+        ],
+        main: "fmap (2*) f1"
+    },
+    syntax: {
         name: "Syntax",
         body: [
+            "-- Not all of the syntax has been implemented yet, but the core features have been:",
+            "",
             "class TypeClass var where",
             "method :: var -> var -> var",
             "",
@@ -68,6 +99,8 @@ const PRESETS = {
             "",
             "function :: (TypeClass var) => var -> var",
             "function arg = method arg arg",
+            "",
+            "-- Lines are only separated by actual new lines, not by wrapping. So all of this is the same comment!",
         ],
         main: "map function (NilCon:((Con 1):((Recursive NilCon):[])))",
     },
