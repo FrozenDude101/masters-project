@@ -43,7 +43,7 @@ function reset() {
 
     let c = createContainer("0");
     cols["0"].appendChild(c);
-    titles["0"].innerHTML = "Setup to begin.";
+    titles["0"].innerHTML = "Write a main function to begin.";
 }
 
 function displayState() {
