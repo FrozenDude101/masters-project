@@ -21,14 +21,14 @@ parseMainInput = (clear) => {
 
         if (!(input.includes("getChar") || input.includes("getLine"))) {
             let i = 0;
-            while (i < 1000 && impl.canStep()) {
+            while (i < 250 && impl.canStep()) {
                 impl = impl.step();
                 i += 1;
             }
-            if (i !== 1000)
+            if (i !== 250)
                 RETURN_VALUE.value = `${impl}`;
         } else {
-            RETURN_VALUE.value = `Not exectued due to input IO.`;
+            RETURN_VALUE.value = `Not executed due to input IO.`;
         }
 
         setupState();
