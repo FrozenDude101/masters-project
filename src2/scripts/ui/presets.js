@@ -103,6 +103,7 @@ const PRESETS = {
             "function arg = method arg arg",
             "",
             "-- Lines are only separated by actual new lines, not by wrapping. So all of this is the same comment!",
+            "-- All infix operators are left-associative, and don't have precedence, so use brackets if required."
         ],
         main: "map function (NilCon:((Con 1):((Recursive NilCon):[])))",
     },
