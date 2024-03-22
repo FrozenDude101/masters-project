@@ -87,6 +87,8 @@ const PRESETS = {
     syntax: {
         name: "Syntax",
         body: [
+            "-- You can click the area on the right to step through the main function.",
+            "-- You can also click individual applications to look at their type information in a separate scope!",
             "-- Not all of the syntax has been implemented yet, but the core features have been:",
             "",
             "class TypeClass var where",
