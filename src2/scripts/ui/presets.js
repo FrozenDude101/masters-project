@@ -14,7 +14,7 @@ const PRESETS = {
         main: "helloWorld",
     },
     echo: {
-        name: "Hello, World!",
+        name: "Echo",
         body: [
         ],
         main: "getLine >>= print",
