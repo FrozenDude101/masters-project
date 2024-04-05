@@ -1,36 +1,21 @@
+const CODE_INPUT = document.getElementById("code-input");
+
+let parseTimeout = null;
+CODE_INPUT.addEventListener("input", () => {
+    clearTimeout(parseTimeout);
+    parseTimeout = setTimeout(() => {
+        let text = CODE_INPUT.value;
+        Parser.main(text);
+        parseMainInput(false);
+    }, 1000);
+});
+
+CODE_INPUT.dispatchEvent(new InputEvent("input"));
+
 function setupState() {
     clearErrors();
-    if (FUNCTION_SELECTOR.value === NO_SELECTION) {
-        addError("No function selected.");
-    }
 
-    state = Program.get(FUNCTION_SELECTOR.value);
-
-    for (let i = 1; i <= argumentCount; i++) {
-        let type = document.getElementById(`argument-type-${i}`).value;
-        let value = document.getElementById(`argument-value-${i}`).value;
-
-        switch (type) {
-            case "Function":
-                state = new ApplicationThunk(state, Program.get(value));
-                break;
-            case "Integer":
-                state = new ApplicationThunk(state, new LiteralThunk(parseInt(value), new LiteralType("Integer")));
-                break;
-            case "Float":
-                state = new ApplicationThunk(state, new LiteralThunk(parseFloat(value), new LiteralType("Float")));
-                break;
-            case "String":
-                state = new ApplicationThunk(state, new LiteralThunk(value), new LiteralType("String"));
-                break;
-            case "None":
-                addError(`No type specified for argument ${i}.`);
-                break;
-        }
-    }
-
-    if (hasErrors())
-        state = null;
+    state = Program.getFunction("main");
 
     cols = {"0": document.getElementById("cc0")}
     rows = {"": document.getElementById("cr")}
@@ -42,7 +27,7 @@ function setupState() {
     typeTitles = {}
     typeBodies = {}
 
-    states["0"] = new ThunkWrapper(state);
+    states["0"] = state;
 
     let container = createContainer("0");
     cols["0"].innerHTML = "";
@@ -52,7 +37,6 @@ function setupState() {
     titles["0"].appendChild(createTypeButton("0"));
 }
 
-let history = [];
 let executeInterval = null;
 function execute() {
     if (!states["0"]) {
@@ -109,15 +93,13 @@ function step() {
         return;
     }
     if (!states["0"].canStep()) {
-        displayResult();
+        displayResult(states["0"]);
         return;
     }
     let pre = ""+states["0"];
     while (""+states["0"] === pre && states["0"].canStep()) {
         states["0"] = states["0"].step();
-        states["0"].normaliseWrappers();
     }
-    history.push(states["0"].clone());
     displayState();
     return;
 }

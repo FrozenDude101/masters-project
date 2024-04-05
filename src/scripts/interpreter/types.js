@@ -20,7 +20,7 @@ class TypeConstraints {
         while (cs.length) {
             let [s, t] = cs.pop();
 
-            if (!(s in trs)) {
+            if (!(s in trs)) { // Eliminate rule.
                 trs[s] = t.clone();
 
                 cs = cs.map(([k,kt]) => [
@@ -33,11 +33,12 @@ class TypeConstraints {
                 continue;
             }
 
-            if (trs[s].equals(t))
+            if (trs[s].equals(t))   // Delete rule.
                 continue;
-            if (!trs[s].canMatch(t, []))
+            if (!trs[s].canMatch(t, [])) // Conflict rule.
                 throw new TypeMatchError(trs[s], t);
 
+            // Decompose rule.
             let cs2 = trs[s].match(t, new TypeConstraints());
             let tr2 = cs2.unify();
             cs = Object.keys(tr2).map(k => [k, tr2[k]]).concat(cs);

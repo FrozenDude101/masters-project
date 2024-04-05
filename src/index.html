@@ -3,20 +3,21 @@
 <html>
 
     <head>
+        <title>Haskell Visualiser</title>
+
         <link rel="stylesheet" href="style.css">
 
-        <script src="scripts/ui/arguments.js" defer></script>
-        <script src="scripts/ui/execution.js" defer></script>
-        <script src="scripts/ui/graph.js" defer></script>
-        <script src="scripts/ui/highlighting.js" defer></script>
-        <script src="scripts/ui/ui.js" defer></script>
-
-        <script src = "scripts/FunctionReference.js" defer></script>
+        <script src = "scripts/ui/execution.js" defer></script>
+        <script src = "scripts/ui/graph.js" defer></script>
+        <script src = "scripts/ui/highlighting.js" defer></script>
+        <script src = "scripts/ui/main.js" defer></script>
+        <script src = "scripts/ui/ui.js" defer></script>
+        <script src = "scripts/ui/presets.js" defer></script>
         
+        <script src = "scripts/lexer/FunctionReference.js" defer></script>
         <script src = "scripts/lexer/Token.js" defer></script>
         <script src = "scripts/lexer/LexerInput.js" defer></script>
         <script src = "scripts/lexer/Lexer.js" defer></script>
-
         <script src = "scripts/lexer/characters.js" defer></script>
         <script src = "scripts/lexer/identifiers.js" defer></script>
         <script src = "scripts/lexer/types.js" defer></script>
@@ -24,64 +25,51 @@
         <script src = "scripts/lexer/literals.js" defer></script>
         <script src = "scripts/lexer/base.js" defer></script>
 
-        <script src = "scripts/parser/Program.js" defer></script>
-        <script src = "scripts/parser/parse.js" defer></script>
-        <script src = "scripts/parser/decls.js" defer></script>
-        <script src = "scripts/parser/types.js" defer></script>
-        <script src = "scripts/parser/pattern.js" defer></script>
-        <script src = "scripts/parser/implementation.js" defer></script>
-        <script src = "scripts/parser/customType.js" defer></script>
+        <script src = "scripts/parser/parser.js" defer></script>
 
-        <script src = "scripts/interpreter/Thunk.js" defer></script>
-        <script src = "scripts/interpreter/Type.js" defer></script>
-        <script src = "scripts/interpreter/Pattern.js" defer></script>
-        <script src = "scripts/interpreter/Arguments.js" defer></script>
-        <script src = "scripts/interpreter/Prelude.js" defer></script>
+        <script src="scripts/interpreter/Program.js" defer></script>
+        <script src="scripts/interpreter/types.js" defer></script>
+        <script src="scripts/interpreter/thunk.js" defer></script>
+        <script src="scripts/interpreter/pattern.js" defer></script>
+        <script src="scripts/interpreter/arguments.js" defer></script>
 
-        <script src = "scripts/main.js" defer></script>
+        <script src="scripts/interpreter/Prelude/prelude.js" defer></script>
+        <script src="scripts/interpreter/Prelude/num.js" defer></script>
+        <script src="scripts/interpreter/Prelude/prelude2.js" defer></script>
+        <script src="scripts/interpreter/Prelude/control.monad.js" defer></script>
+        <script src="scripts/interpreter/Prelude/data.list.js" defer></script>
+        <script src="scripts/interpreter/Prelude/io.js" defer></script>
+        <script src="scripts/interpreter/Prelude/data.maybe.js" defer></script>
     </head>
-
+    
     <body id="body">
         <div id="input-container">
+            <select id="presets">
+            </select>
             <div>
                 <div id="backdrop">
                     <div class="highlight-sync" id="highlights">
                     </div>
                 </div>
-                <textarea class="highlight-sync" id="code-input" rows=25 cols=50>
-data List a = Nil | Cons a (List a)
-
-ls :: List Integer
-ls = Cons 1 Nil</textarea>
+                <textarea class="highlight-sync" id="code-input" rows=25 cols=50 placeholder="Write your haskell code here, and use the controls below to see how it executes!&#10;&#10;A number of the built in functions are available for you to use.&#10;&#10;Write a main function in the inputs below to experiment with types and get instant execution.&#10;&#10;Once written, click on the area on the right to step through the function as it executes.&#10;&#10;You can also select a specific part of the function, to separate it into its own context."></textarea>
+            </div>
+            <div>
+                <textarea id="stdout" rows=5 cols=50 placeholder="This is stdout, IO output will go here."></textarea>
             </div>
             <div id="scrollable-container">
-                <div id="error-container"></div>
-                <select id="function-selector">
-                    <option>Select a function.</option>
-                </select>
-                <div>
-                    <span class="title literal-span">Return Type: </span>
-                    <input id="return-type">
+                <div class="sc-row">
+                    <span class="title">main ::</span>
+                    <input id="main-type">
                 </div>
-                <div>
-                    <span class="title">Return Value:</span>
+                <div class="sc-row">
+                    <span class="title literal-span">main  =</span>
+                    <input id="main-input">
+                </div>
+                <div class="sc-row">
+                    <span class="title literal-span">returns</span>
                     <input id="return-value">
                 </div>
-                <div>
-                    <span class="title" id="argument-title">
-                        Arguments (<span id="argument-count">0</span><span id="required-argument-count"></span>):
-                    </span>
-                    <button id="add-argument" onclick="addArgument()">+</button>
-                    <button id="remove-argument" onclick="removeArgument()" disabled>-</button>
-                </div>
-                <div id="argument-container"></div>
-            </div>
-            <div id="controls">
-                <button onclick="execute()">Execute</button>
-                <button onclick="start()">Start</button>
-                <button onclick="step()">Step</button>
-                <button onclick="stop()">Stop</button>
-                <button onclick="reset()">Reset</button>
+                <div id="error-container"></div>
             </div>
         </div>
         <div class="container-row" id="cr">

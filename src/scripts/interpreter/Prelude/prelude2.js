@@ -33,7 +33,7 @@ subtract a b = a - b
 even :: (Integral a) => a -> Bool
 even n = (rem n 2) == 0
 odd :: (Integral a) => a -> Bool
-odd n = (rem n 2) /= 0
+odd n = not (even n)
 
 gcd :: (Integral a) => a -> a -> a
 gcd x y = ite (y == 0) x (gcd y (rem x y))

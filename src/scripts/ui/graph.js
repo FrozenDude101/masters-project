@@ -20,18 +20,38 @@ let typeCols = {
 let typeTitles = {}
 let typeBodies = {}
 
+function reset() {
+    document.getElementById("cr").innerHTML = `<div class="container-column" id="cc0"></div>`;
+    cols = {
+        "0": document.getElementById("cc0"),
+    }
+    rows = {
+        "": document.getElementById("cr"),
+    }
+    titles = {
+
+    }
+    bodies = {
+        
+    }
+    marked = [];
+    typeCols = {
+
+    }
+    typeTitles = {}
+    typeBodies = {}
+
+    let c = createContainer("0");
+    cols["0"].appendChild(c);
+    titles["0"].innerHTML = "Write a main function to begin!";
+}
+
 function displayState() {
     if (states["0"] === null) return;
+    bodies["0"].innerHTML = states["0"].toHtml();
     for (let b in bodies) {
-        states[b].annotate(b);
-        bodies[b].innerHTML = states[b].toString(false, true);
+        bodies[b].innerHTML = states[b].toHtml();
     }
-    for (let c of marked) {
-        removeContainer(c);
-    }
-    marked = Object.keys(states).filter(
-        k => !states[k].canStep() 
-    )
 }
 
 function applicationMouseOver(event, id) {
@@ -45,19 +65,25 @@ function applicationMouseOut(event, id) {
         e.classList.remove("hover");
     }
 }
-function applicationClick(event, collection, id) {
+function applicationClick(event, id) {
     event.stopPropagation();
 
-    let tW = states[collection].getById(id);
-    if (states.id === id) return;
-    for (let k in states) {
-        if (states[k] === tW) return;
+    if (Object.values(states).includes(id))
+        return;
+
+    let parent = "0";
+    for (let b in bodies) {
+        if (states[b].getThunkById(id)) {
+            parent = b;
+        }
     }
 
-    let cID = createCol(tW.collection).id.slice(2);
-    tW.annotate(cID);
+    let cID = createCol(parent).id.slice(2);
 
-    states[cID] = tW;
+    states[cID] = states["0"].getThunkById(id);
+    tW = states["0"].getThunkById(id);
+    console.log(tW+"");
+
     titles[cID].innerHTML = ""+tW;
     titles[cID].appendChild(createTypeButton(cID));
     displayState();
@@ -113,6 +139,8 @@ function createContainer(id) {
     r.classList.add("container-row");
     r.appendChild(container);
 
+    let tb = createTypeButton(id);
+
     return r;
 }
 function createTypeButton(id) {
@@ -160,9 +188,9 @@ function containerClick(id) {
         removeContainer(id);
         return;
     };
-    let pre = ""+states[id];
-    while (""+states[id] === pre && states[id].canStep()) {
-        states[id].step();
+    let pre = states[id]+"";
+    while (states[id]+"" === pre) {
+        states[id] = states[id].step();
     }
     displayState();
 }
@@ -198,7 +226,7 @@ function createTypeContainer(id) {
     closeButton.innerHTML = "X";
     closeButton.onclick = () => removeTypeContainer(id);
 
-    title.innerHTML = states[`${id}`].type;
+    title.innerHTML = typeToString(states[`${id}`].type);
     title.appendChild(closeButton);
 
     if (states[`${id}`].t instanceof ApplicationThunk) {
@@ -228,6 +256,4 @@ function typeClick(event, id) {
     document.getElementById(`c${id}`).insertAdjacentElement("afterend", col);
 }
 
-let c = createContainer("0");
-cols["0"].appendChild(c);
-titles["0"].innerHTML = "Setup to begin.";
+reset();

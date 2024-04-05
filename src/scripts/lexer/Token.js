@@ -35,5 +35,10 @@ class Token {
         this.index = index;
 
     }
+    toString() {
+        if (this.value === undefined)
+            return `${this.type}`;
+        return `'${this.type} ${this.value}'`;
+    }
 
 }

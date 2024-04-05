@@ -1,3 +1,4 @@
+const CODE_INPUT  = document.getElementById("code-input");
 const BACKDROP    = document.getElementById("backdrop");
 const HIGHLIGHTS  = document.getElementById("highlights");
 

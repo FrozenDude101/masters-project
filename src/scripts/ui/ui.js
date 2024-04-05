@@ -12,17 +12,6 @@ const RETURN_VALUE = document.getElementById("return-value");
 
 let state = null;
 
-FUNCTION_SELECTOR.addEventListener("change", () => {
-    if (FUNCTION_SELECTOR.value === NO_SELECTION) {
-        updateRequiredArgumentCount(-1);
-        return;
-    }
-
-    let fT = Program.get(FUNCTION_SELECTOR.value);
-    let p = fT.patterns[0];
-    updateRequiredArgumentCount(p.length());
-});
-
 function addError(e) {
     let element = document.createElement("div");
     element.classList.add("error-message");
@@ -35,9 +24,4 @@ function clearErrors() {
 }
 function hasErrors() {
     return ERROR_CONTAINER.children.length !== 0;
-}
-
-function displayResult() {
-    RETURN_VALUE.value = state;
-    RETURN_TYPE.value = state.type;
 }

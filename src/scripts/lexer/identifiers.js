@@ -37,7 +37,7 @@ t_reservedid.set(tok(any(
     "infix", "infixl", "infixr", "instance", "let", "module", "newtype", "of", "then", "type", "where",
 ), Token.KEYWORD));
 t_reservedop.set(tok(any(
-    "..", ":", "::", "=", "\\", "|", "<-", "->", "@", "~", "=>",
+    "..", "::", "=", "\\", "|", "<-", "->", "@", "~", "=>",
 ), Token.OP));
 
 t_varid.set(tok(diff(
@@ -49,7 +49,7 @@ t_conid.set(tok(all(
 ), Token.CONID));
 
 t_varsym.set(tok(diff(
-    all(diff(t_symbol, ":"), many(t_symbol)),
+    all(t_symbol, many(t_symbol)),
     any(t_reservedop, t_dashes),
 ), Token.VARSYM));
 t_consym.set(tok(diff(

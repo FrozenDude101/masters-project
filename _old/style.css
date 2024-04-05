@@ -26,11 +26,11 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 5px;
 }
 
-#code-input, #stdout {
+#code-input {
     margin: 0;          /* Firefox fix */
     border-radius: 0;   /* iOS fix */
 
@@ -40,9 +40,6 @@
     overflow-y: scroll;
 
     color: white;
-
-    font-family: monospace;
-    font-size: medium;
 }
 .highlight-sync {
     font-family: monospace;
@@ -69,7 +66,6 @@ mark {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    align-items: stretch;
     align-self: stretch;
     overflow: hidden auto;
     flex-grow: 1;
@@ -102,17 +98,6 @@ mark {
 .argument-input {
     flex-grow: 1;
     margin-right: 5px;
-}
-
-.sc-row {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: stretch;
-    align-items: center;
-    gap: 5px;
-}
-.sc-row input {
-    flex-grow: 1;
 }
 
 .container-column {
@@ -149,7 +134,6 @@ mark {
     color: white;
     font-size: large;
     text-align: center;
-    user-select: none;
 
     border-radius: 5px;
     transition-duration: 100ms;
