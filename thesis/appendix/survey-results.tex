@@ -1,0 +1,58 @@
+\section{Survey Results}
+\label{survey}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{p{0.6\linewidth}|p{0.25\linewidth}}
+        Question & Responses\\\hline
+        Are/have you taken the 2$^{nd}$ year Functional Programming module? & 11 - Yes, 3 - Currently taking it.\\\hline
+        For Haskell, have you used any tools/visualisers for testing and debugging? & 10 - No, 3 - GHCi, 1 - VSCode\\\hline
+        Which tools/visualisers have you used for testing and debugging other languages? & 5 - VSCode Plugins, 4 - IDE Debuggers, 2 - GDB, 3 - No\\\hline
+        How did you find the transition from object-oriented imperative languages to a functional language? (1-5, hard-easy) & 1 2 2 3 3 3 3\newline4 4 4 4 4 5 5\\\hline
+        How well would you say you understood the following concepts? (0-1-5, I don't know what that is-not well-very well) &\\\hline
+        Higher Order Functions &2 3 4 4 4 4 4\newline4 5 5 5 5 5 5\\\hline
+        Anonymous Functions &3 3 3 4 4 4 4\newline5 5 5 5 5 5 5\\\hline
+        Monads &0 0 1 2 2 2 3\newline3 3 3 3 4 4 4\\\hline
+        Lazy Evaluation &0 0 0 0 3 3 3\newline4 4 4 4 5 5 5\\\hline
+        Partial Application &0 1 2 2 3 3 4\newline4 4 4 5 5 5 5\\\hline
+        Pure Functions &0 0 1 1 2 3 3\newline4 4 4 5 5 5 5\\
+    \end{tabular}
+    \caption{Questions and responses as a preliminary survey.}
+    \label{tab:user-evaluation}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{p{\linewidth}}\hline
+    It was sometimes unclear what exactly designated say a certain class of functions (eg for me, monads) - I could use them, but never fully understand WHY they worked or were a certain way. I tried a lot to mostly just practise lots of different applications of different concepts to get an intuitive feel for them.\\\hline
+    Monads were slightly tricky. Visualising them as containers/wrappers around some primitive type, and the bind operator as a transform from one wrapper to another, helped a lot\\\hline
+    I mainly found a disconnect between how the concepts were explained and how I would actually apply them within programs\\\hline
+    Mainly the lack of examples that we could apply the concepts to. With lazy evaluation and monads, I found that it wasn't until I went away and did my own learning in my free time (with textbooks and videos) that they made total sense and I could use them.\\\hline
+    I understand monads at a surface level but not much more. This may be because we weren’t required to learn them that deeply but I still didn’t find them intuitive\\\hline
+    Why are functions pure and impure? I never really figured it out. I remember memorising some functions that "lifted" functions to return a value, but that has left my brain now.\\\hline
+    \end{tabular}
+    \caption{Additional comments to the ``How well would you say you understood the following concepts?'' question.}
+    \label{tab:comments}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{p{\linewidth}}\hline
+        Yes, mostly because I found them fun\\\hline
+        Very likely because it is expressive for some tasks, esp those requiring correctness and notational accuracy with the underlying math\\\hline
+        Not very likely because it has bad tooling (stack <<<<<)\\\hline
+        I would be fairly likely as I find recursion intuitive and enjoy the elegance of functional programs\\\hline
+        Extremely likely!\\\hline
+        I just enjoy using functional languages so I'll use them for fun for personal projects, but also I want to go into research and lecturing in a Theory of Computation department, so they can prove very useful\\\hline
+        Fairly likely, since I've worked with them in industry\\\hline
+        I’m much more comfortable in oop languages so not likely, but if a use case comes up that is perfect for functional I would.\\\hline
+        Unlikely. Most jobs don’t require skills related to functional programming\\\hline
+        Pretty likely, it seems like an interesting concept that I enjoy programming in the style of.\\\hline
+        Python is my main programming language and inherits many aspects of functional programming that I use frequently: list comprehensions, currying \& partial functions, Anonymous/lambda functions, higher order functions.\\\hline
+        Less likely as it's not that interesting to me\\\hline
+        Unlikely - however functional paradigms are something I use in imperative software as a result of having studied purely functional languages.\\\hline
+        Honestly, never again\\\hline
+    \end{tabular}
+    \caption{Answers to the ``How likely are you to use a functional language in the future?'' question.}
+    \label{tab:future}
+\end{table}

@@ -1,0 +1,34 @@
+\begin{figure}
+\centering
+
+\begin{tikzpicture}[scale=2,
+type/.style = {
+    rectangle, rounded corners,
+    draw=black, fill=blue!40, drop shadow,
+    text centered, anchor=north, text=white, text width=2.6cm,
+},
+arrow/.style = {
+    shorten >= 0.33cm, shorten <= 0.33cm
+}]
+
+\node (root)  [type, text width=6cm] at (0, 2) {FunctionType\\(a $\rightarrow$ Integer) $\rightarrow$ a $\rightarrow$ Integer};
+\node (lFunc) [type] at (-1.8, 1) {FunctionType\\a $\rightarrow$ Integer};
+\node (rFunc) [type] at (1.8, 1) {FunctionType\\a $\rightarrow$ Integer};
+\node (lA)    [type] at (-2.7, 0) {UnboundType\\a};
+\node (rA)    [type] at (0.9, 0) {UnboundType\\a};
+\node (lInt)  [type] at (-0.9, 0) {LiteralType\\Integer};
+\node (rInt)  [type] at (2.7, 0) {LiteralType\\Integer};
+
+\draw[->, arrow] (root) -- (lFunc);
+\draw[->, arrow] (root) -- (rFunc);
+\draw[->, arrow] (lFunc) -- (lA);
+\draw[->, arrow] (lFunc) -- (lInt);
+\draw[->, arrow] (rFunc) -- (rA);
+\draw[->, arrow] (rFunc) -- (rInt);
+
+\end{tikzpicture}
+
+\caption{The internal representation of: (a $\rightarrow$ Integer) $\rightarrow$ a $\rightarrow$ Integer}
+\label{fig:a-int--a-int}
+    
+\end{figure}

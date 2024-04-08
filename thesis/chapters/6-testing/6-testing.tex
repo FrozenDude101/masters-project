@@ -1,0 +1,13 @@
+\section{Testing} \label{testing}
+Due to constructing each feature incrementally, progress on each feature could be gated by successful tests. In this case, implementing basic functionality was done, and corrected until tests passed, before implementing both data types, and then type classes. This ensured additional features didn't break the existing ones, creating a strong foundation to build from.
+
+Once type classes had been introduced, a large number of Haskell's standard library was implemented to facilitate integration testing. Implementing these covered both an extensive range of test cases (as they covered all of the implemented features of Haskell), and gave a subset of the Haskell standard library for the user to use while making their own functions. They are run when the page is initially loaded, outputting positive and negative results into the console, which allowed for errors to be quickly pinpointed. These tests covered lexing, parsing, and type checking of functions, data types, and type classes, as if any failed to parse and threw an error, it could be inspected and the code fixed. In most error cases they failed due to being incorrectly defined, a problem with the function itself and not the tool, however they were important to catching a variety of edge cases, such as type class constraints within a class method seen only in the ``RealFrac'' class, shown in Figure \ref{fig:realfrac}. Initially class methods did attempt to parse class constraints, and so when ``RealFrac'' was added it causes a parse error.
+\input{chapters/6-testing/figures/realfrac}
+These are contained within \texttt{src/interpreter/Prelude}.
+
+The structure of various standard library functions for both types and thunks was checked manually, to ensure they had parsed correctly. With the earlier unit tests passing, no issues were found when analysing the parser output, an example is shown in Figure \ref{fig:intergration-testing}.
+\input{chapters/6-testing/figures/integration-testing}
+
+The visualiser output also had to be checked manually. For this a number of preset functions were made to quickly load between, such as the ``Functor'' preset shown in Figure \ref{fig:preset}, and then stepped through to check each step to make sure it was correct. This also checked the type information that displayed was correct, and the "main" function displayed the correct final result when evaluated live, such as in Figure \ref{fig:vis}.
+\input{chapters/6-testing/figures/preset}
+\input{chapters/6-testing/figures/vis}

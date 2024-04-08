@@ -1,0 +1,13 @@
+% rightorleftmark
+% By egreg @ https://tex.stackexchange.com/a/101926
+% returns \rightmark if it exists, otherwise returns \leftmark
+
+\makeatletter
+\newcommand{\rightorleftmark}{%
+  \begingroup\protected@edef\x{\rightmark}%
+  \ifx\x\@empty
+    \endgroup\leftmark
+  \else
+    \endgroup\rightmark
+  \fi}
+\makeatother

@@ -1,0 +1,12 @@
+\begin{figure}[h]
+    \centering
+    \begin{lstlisting}[language=Haskell]
+foo :: Integer -> Integer
+foo 0 = 1
+foo a = a
+foo _ = 0
+
+main = foo (1+1)\end{lstlisting}
+    \caption{$(1+1)$ must be evaluated before the pattern can test each match.}
+    \label{fig:requires-steps}
+\end{figure}

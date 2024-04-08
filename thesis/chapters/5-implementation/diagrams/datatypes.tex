@@ -1,0 +1,16 @@
+\begin{figure}
+    \centering
+    \begin{lstlisting}[language=Haskell]
+data Foo a b c = Unit
+               | Fixed Integer
+               | Var a b c
+               | Reverse c b a
+               | Omit a c
+
+example :: Foo Integer String Bool -> Foo a b c
+example (Var u v w)     = Unit
+example (Reverse x y z) = Fixed 1
+\end{lstlisting}
+    \caption{While all of ``Foo'''s constructors return a value of ``Foo a b c'', the order of their arguments (if any) can differ from the order in the declaration.}
+    \label{fig:datatype}
+\end{figure}

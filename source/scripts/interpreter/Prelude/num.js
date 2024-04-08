@@ -120,12 +120,12 @@ Program.registerInstanceMethod("Prelude", "Floating", Program.getType("Float"), 
 Program.registerInstanceMethod("Prelude", "Floating", Program.getType("Float"), "atanh", (a) => Math.atanh(a));
 
 Parser.Prelude(`
-class (Real a, Fractional a) => RealFrac a where
-    -- properFraction :: (Integral b) => a -> (b,a)
-    truncate :: (Integral b) => a -> b
-    round :: (Integral b) => a -> b
-    ceiling :: (Integral b) => a -> b
-    floor :: (Integral b) => a -> b
+    class (Real a, Fractional a) => RealFrac a where
+        -- properFraction :: (Integral b) => a -> (b,a)
+        truncate :: (Integral b) => a -> b
+        round :: (Integral b) => a -> b
+        ceiling :: (Integral b) => a -> b
+        floor :: (Integral b) => a -> b
 `);
 
 Program.registerInstance("Prelude", "RealFrac", Program.getType("Float"));

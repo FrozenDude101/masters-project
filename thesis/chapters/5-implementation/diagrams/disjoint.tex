@@ -1,0 +1,8 @@
+\begin{figure}
+    \centering
+    \begin{lstlisting}[language=Haskell]
+foo :: (a -> b) -> b -> b
+foo f b = f b\end{lstlisting}
+    \caption{``foo'' actually has the type ``$\forall a. \forall b. (a\rightarrow b)\rightarrow b\rightarrow b$'', which fails as `b' can only be bound to ``a $\rightarrow$ b'' when ``a'' and ``b'' are equal, not for all ``a'' and ``b''.}
+    \label{fig:disjoint}
+\end{figure}

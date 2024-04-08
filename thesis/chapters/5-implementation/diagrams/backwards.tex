@@ -1,0 +1,8 @@
+\begin{figure}
+    \centering
+    \begin{lstlisting}[language=Haskell]
+foo :: (a -> a -> b -> b -> Integer) -> a -> b
+bar :: (c -> d -> d -> e -> e)\end{lstlisting}
+    \caption{If bar is matched to foo, \texttt{Integer} is matched to all the variables ``a'', ``b'', ``c'', ``d'', ``e''. Without backwards matching only ``e'' would be inferred correctly!}
+    \label{fig:backwards}
+\end{figure}

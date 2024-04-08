@@ -1,0 +1,12 @@
+\begin{figure}[b]
+    \centering
+    \begin{lstlisting}[language=Haskell]
+class (Real a, Fractional a) => RealFrac a where
+    properFraction :: (Integral b) => a -> (b,a)
+    truncate :: (Integral b) => a -> b
+    round :: (Integral b) => a -> b
+    ceiling :: (Integral b) => a -> b
+    floor :: (Integral b) => a -> b\end{lstlisting}
+    \caption{Of all the type classes, ``RealFrac'' is the only one that contains method that have a constraint, ``Integral b''.}
+    \label{fig:realfrac}
+\end{figure}

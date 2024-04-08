@@ -1,0 +1,18 @@
+\section{Specification} \label{specification}
+A variety of measures will be used to determine if the project is a success. To ensure a robust system, these will be implemented incrementally, and tested for reliability and correctness, as well as usability by the end user.
+
+\subsection{Functional Requirements} \label{functional-requirements}
+\begin{enumerate}
+    \item The tool must be able to parse user input into the correct expression, and parse as they would expect a Haskell expression to.
+    \item The tool should report appropriate errors on malformed inputs, including both syntax and type errors, so the user can debug and modify their code.
+    \item The tool must be able to evaluate the expression correctly, and evaluate as they would expect a Haskell expression to.
+    \item The tool must be able to visualise expressions correctly, to accurately represent the expression.
+    \item The tool must be able to visualise the type of expressions correctly, to accurately represent the type of the expression.
+\end{enumerate}
+
+\subsection{Non-Functional Requirements} \label{non-functional-requirements}
+\begin{enumerate}
+    \item The tool should parse user inputs within a short period of time, so the user can quickly see changes they make take effect.
+    \item The tool should not slow down when visualising large expressions, as Haskell expressions can become very large while they evaluate.
+    \item The tool should be easy to understand by the user, to ensure they can learn from it.
+\end{enumerate}

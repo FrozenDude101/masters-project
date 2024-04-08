@@ -1,0 +1,21 @@
+\section{Evaluation} \label{evaluation}
+
+\subsection{Requirements}
+From the testing in Section \ref{testing}, it's clear that the functional requirements listed in Section \ref{functional-requirements} have been met as required. Although not every feature of Haskell has been implemented, the planned core features required for use: functions, data types, and type classes, as well as IO, have been implemented. The user is able to quickly respond to both syntax and type errors, with the live evaluation features, and can step through expressions, and see the type of expressions using the visualiser.
+
+The following discussions on each non-functional requirement are in the same order specified in Section \ref{non-functional-requirements}.
+\begin{enumerate}
+    \item Inputs that use the entire input field, about 500 characters, take a few seconds to fully parse. This is mitigated by only parsing once the user stops inputting for a couple seconds, and is a similar approach used by common live code analysers.
+    \item As the visualisation only updates when stepped, and is not continually refreshed, there is no noticeable delay between states. This is also improved by splitting of sub-expressions from their parents, as only one expression updates at a time.
+    \item As shown from a short user evaluation survey in Table \ref{tab:user-evaluation}, on a scale from 1-5 with 1 being the worst, 5 being the best, on average user's rated the visualiser a 3.6 out of 5 for ease of use, and  a 3.3 out of 5 for how well it helped with understanding of Haskell and functional programming.
+\end{enumerate}
+
+\subsection{Further Improvements}
+\subsubsection{The Haskell Language}
+There are many ways this visualiser could still be improved. Countless features from the Haskell 2010 Language Report \cite{haskell2010} were not implemented to save time and create a working prototype quickly. This includes many of the keywords, such as fixity declarations, as well as extending to GHC Haskell, which has a much larger array of changes and additions from new type classes, to language extensions. There are also a few changes from the Haskel 2010 Language Report, such as lists being called ``List a'' instead of ``[a]''.
+The Standard Library has also not been fully implemented. Missing many functions that handle tuple types, as well as ones that use the ``seq'' function, that forcefully evaluates a value. Extending to GHC Haskell would also require extending the standard library to the considerably larger GHC standard library.
+\subsubsection{Performance}
+While the performance is at an acceptable level, it could be improved. If the user wanted to evaluate a large program, it will take several seconds to parse. During this time, the visualiser temporarily freezes. This also occurs when the visualiser is opened, as it loads each function. This is partially mitigated by splitting parsing on double new lines, to break a large input into many smaller inputs, but the delay is still noticeable.
+As mentioned, visualisation of expressions has no issues with performance due to only being updated when required, rather than updating all of the expressions every time one expression changes.
+\subsubsection{Visualisation}
+While the visualisation works well to show expressions and the thunks within, it is not perfect. Oftentimes there are more or less brackets than expected which can clutter the display or confuse the user respectively. On the other hand, the ability for the user to evaluate part of an expression, without affecting the entire thing, was a well liked feature of this visualiser that is not present in others.

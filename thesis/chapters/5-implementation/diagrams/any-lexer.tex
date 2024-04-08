@@ -1,0 +1,10 @@
+\begin{figure}
+    \centering
+    \begin{lstlisting}[language=JavaScript]
+function any(...fs) {
+    // Attempt to lex against each choice, returning all matches.
+    return (input) => fs.map(f => lexer(f)(input));
+}\end{lstlisting}
+    \caption{The lexer corresponding to the choice rule, returning all matches.}
+    \label{fig:any-lexer}
+\end{figure}

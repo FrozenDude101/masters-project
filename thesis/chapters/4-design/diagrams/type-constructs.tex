@@ -1,0 +1,16 @@
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|p{0.6\linewidth}}
+        Type & Use \\\hline
+        {\it typeidentifier} & A type identifier.\\
+        {\it TypeConstructor} & A type constructor.\\
+        {\it type$_1$} $\rightarrow$ {\it type$_2$} & Function type from {\it type$_1$} to {\it type$_2$}.\\
+        {\it type$_1$} {\it type$_2$} & Type application, applying {\it type$_2$} to {\it type$_1$}.\\
+        $[${\it type}$]$ & A list of values with the type {\it type}.\\
+        ({\it type$_1$},{\it type$_2$}) & The tuple type between {\it type$_1$} of {\it type$_2$}.\\
+        ({\it type$_1$},{\it type$_2$},{\it type$_3$}) & The tuple type of {\it type$_1$}, {\it type$_2$}, and {\it type$_3$}.\\
+        ... & ...
+    \end{tabular}
+    \caption{Various built in type syntax.}
+    \label{tab:type-constructs}
+\end{table}

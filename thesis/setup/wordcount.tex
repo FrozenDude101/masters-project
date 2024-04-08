@@ -1,0 +1,6 @@
+% wordcount
+% Found by phald @ https://tex.stackexchange.com/q/526264
+% returns the wordcount of the document
+
+\newcommand\wordcount{
+\immediate\write18{texcount -inc -sum -0 -template={SUM} main.tex > count.txt}\input{count.txt}}

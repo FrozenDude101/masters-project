@@ -1,0 +1,35 @@
+\begin{figure}
+\centering
+
+\begin{tikzpicture}[scale=2,
+type/.style = {
+    rectangle, rounded corners,
+    draw=black, fill=blue!40, drop shadow,
+    text centered, anchor=north, text=white, text width=3cm,
+},
+arrow/.style = {
+    shorten >= 0.33cm, shorten <= 0.33cm
+}]
+
+\node (root) [type, text width=6cm] at (0, 2) {
+    FunctionType\\
+    Num a $\Rightarrow$ a $\rightarrow$ Maybe a
+};
+\node (lA)   [type] at (-1.8, 1) {UnboundType\\Num a $\Rightarrow$ a};
+\node (app)  [type, text width=4cm] at (1.8, 1) {
+    ApplicationType\\Num a $\Rightarrow$ Maybe a
+};
+\node (rM)   [type] at (0.9, 0) {LiteralType\\Maybe};
+\node (rA)   [type] at (2.7, 0) {UnboundType\\Num a $\Rightarrow$ a};
+
+\draw[->, arrow] (root) -- (lA);
+\draw[->, arrow] (root) -- (app);
+\draw[->, arrow] (app) -- (rM);
+\draw[->, arrow] (app) -- (rA);
+
+\end{tikzpicture}
+
+\caption{The internal representation of: Num a $\Rightarrow$ a $\rightarrow$ Maybe a}
+\label{fig:na-na}
+    
+\end{figure}

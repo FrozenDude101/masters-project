@@ -1,0 +1,42 @@
+\begin{figure}
+    \centering
+\begin{tabular}{l c p{0.72\linewidth}}
+
+Symbol & $\rightarrow$ & Expression\\\hline
+\textit{program} & $\rightarrow$ & \{\textit{typeclass} $|$ \textit{instance} $|$ \textit{datatype} $|$ \textit{funcDecl} $|$ \textit{funcImpl}\}\\
+\textit{typeclass} & $\rightarrow$ & \texttt{class} [\texttt{(}\textit{context}\texttt{)} \texttt{=>}] \textit{conid} \textit{varid} \texttt{where} \textit{lf} \{\textit{funcDecl}\}\\
+\textit{instance} & $\rightarrow$ & \texttt{instance} [\texttt{(}\textit{context}\texttt{)} \texttt{=>}] \textit{conid} \texttt{where} \textit{lf} \{\textit{funcImpl}\}\\
+\textit{datatype} & $\rightarrow$ & \texttt{data} \textit{conid} \{\textit{varid}\} \texttt{=} \{\textit{varid} $|$ \textit{conid} $|$ \texttt{(}\textit{type}\texttt{)}\}\\
+\textit{type} & $\rightarrow$ & \textit{btype} [\texttt{->} \textit{type}]\\
+\textit{btype} & $\rightarrow$ & \textit{atype} [\textit{btype}]\\
+\textit{atype} & $\rightarrow$ & \texttt{()} $|$ \textit{varid} $|$ \textit{conid} $|$ \texttt{(}\textit{type}\texttt{)}\\
+\textit{context} & $\rightarrow$ & \textit{constraint} [\texttt{,} \textit{context}]\\
+\textit{constraint} & $\rightarrow$ & \textit{conid} \textit{varid}\\
+\textit{funcDecl} & $\rightarrow$ & \textit{var} \texttt{::} [\texttt{(}\textit{context}\texttt{)} \texttt{=>}] \textit{type}\\
+\textit{funcImpl} & $\rightarrow$ & \textit{var} \textit{pattern} \texttt{=} \textit{expression}\\
+\textit{pattern} & $\rightarrow$ & \textit{argument} [\textit{pattern}]\\
+\textit{argument} & $\rightarrow$ & \textit{literal} $|$ \textit{varid} $|$
+\textit{conid} $|$ \texttt{[]} $|$ \texttt{(}\textit{argument}\texttt{:}\textit{pattern}\texttt{)} $|$ \texttt{(}\textit{pattern}\texttt{)}\\ 
+\textit{expression} & $\rightarrow$ & \textit{aexpression} [\textit{expression}]\\
+\textit{aexpression} & $\rightarrow$ & \textit{literal} $|$ \texttt{[]} $|$ \texttt{()} $|$ \textit{var} $|$ \textit{conid} $|$ \textit{symbol} $|$ \texttt{(}\textit{expression}\texttt{:}\textit{expression}\texttt{)} $|$ \texttt{(}\textit{expression}\texttt{)}\\
+\textit{var} & $\rightarrow$ & \textit{varid} $|$ \texttt{(}\textit{symbol}\texttt{)}\\
+\textit{varid} & $\rightarrow$ & \textit{small} \{\textit{small} $|$ \textit{large} $|$ \textit{digit} $|$ \texttt{'}\}\\
+\textit{conid} & $\rightarrow$ & \textit{large} \{\textit{small} $|$ \textit{large} $|$ \textit{digit} $|$ \texttt{'}\}\\
+\textit{literal} & $\rightarrow$ & \textit{int} $|$ \textit{float} $|$ \textit{hex} $|$ \textit{oct} $|$ \textit{char} $|$ \textit{string}\\
+\textit{int} & $\rightarrow$ & \textit{digit} \{\textit{digit}\}\\
+\textit{float} & $\rightarrow$ & (\textit{int}\texttt{.}\textit{int} [\textit{exponent}]) $|$ \textit{int} \textit{exponent}\\
+\textit{exponent} & $\rightarrow$ & (\texttt{e} $|$ \texttt{E}) [\texttt{+} $|$ \texttt{-}] \textit{int}\\
+\textit{hex} & $\rightarrow$ & \texttt{0} (\texttt{x} $|$ \texttt{X}) \textit{hexit} \{\textit{hexit}\}\\
+\textit{oct} & $\rightarrow$ & \texttt{0} (\texttt{o} $|$ \texttt{O}) \textit{octit} \{\textit{octit}\}\\
+\textit{symbol} & $\rightarrow$ & \texttt{!} $|$ \texttt{\$} $|$ \texttt{\%} $|$ \texttt{\&} $|$ \texttt{*} $|$ \texttt{+} $|$ \texttt{.} $|$ \texttt{/} $|$ \texttt{<} $|$ \texttt{=} $|$ \texttt{>} $|$ \texttt{?} $|$ \texttt{ˆ} $|$ \texttt{|} $|$ \texttt{-} $|$ \texttt{˜} $|$ \texttt{:}\\
+\textit{small} & $\rightarrow$ & a $|$ b $|$ \ldots $|$ z\\
+\textit{large} & $\rightarrow$ & A $|$ B $|$ \ldots $|$ Z\\
+\textit{digit} & $\rightarrow$ & 0 $|$ 1 $|$ \ldots $|$ 9\\
+\textit{octit} & $\rightarrow$ & 0 $|$ 1 $|$ \ldots $|$ 7\\
+\textit{hexit} & $\rightarrow$ & digit $|$ a $|$ \ldots $|$ f $|$ A $|$ \ldots $|$ F\\
+\textit{lf} & $\rightarrow$ & \texttt{$\backslash$n}\\
+
+\end{tabular}
+    \caption{The grammar of the Haskell-like language.}
+    \label{fig:grammar}
+\end{figure}

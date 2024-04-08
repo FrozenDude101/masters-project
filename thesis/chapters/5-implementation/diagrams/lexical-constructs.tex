@@ -1,0 +1,17 @@
+\begin{table}
+    \centering
+    \begin{tabular}{c|p{0.5\linewidth}}
+        Lexer Function & Use\\\hline
+        all & Matches the grouping rule.\\
+        any & Matches the choice rule.\\
+        opt & Matches the optional rule.\\
+        many & Matches the zero or more rule.\\
+        diff & Matches the difference rule.\\
+        str & Matches a string exactly.\\
+        reg & Matches a regex exactly.\\
+        tok & Combines and labels all tokens into one token.\\
+        max & Returns the sequence according to the maximal munch rule.\\
+    \end{tabular}
+    \caption{The basic building blocks of my lexer combinator.}
+    \label{tab:lexical-constructs}
+\end{table}
